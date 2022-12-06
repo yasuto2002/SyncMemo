@@ -1,0 +1,85 @@
+version: "3.9"
+# ref: https://docs.docker.com/compose/compose-file
+services:
+  app:
+    container_name: Nuxt
+    build: ./docker/app/
+    ports:
+      - 3000:3000
+      - 24678:24678
+      - 4000:4000
+    volumes:
+      - ./app:/app
+    stdin_open: true
+    tty: true
+    environment:
+      TZ: Asia/Tokyo
+  go:
+    image: syncmemo
+    build:
+      context: ./docker/go/
+      args:
+        - target=dev
+    environment:
+      TODO_ENV: dev
+      PORT: 8080
+      TODO_DB_HOST: memo-db
+      TODO_DB_PORT: 3306
+      TODO_DB_USER: memo
+      TODO_DB_PASSWORD: memo
+      TODO_DB_NAME: memo
+      TODO_REDIS_HOST: memo-redis
+      TODO_REDIS_PORT: 6379
+    volumes:
+      - ./go:/app
+    ports:
+      - "18000:8080"
+  memo-db:
+    image: mysql:8.0.29
+    platform: linux/x86_64
+    container_name: memo-db
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_USER: memo
+      MYSQL_PASSWORD: memo
+      MYSQL_DATABASE: memo
+    volumes:
+      - memo-db-data:/var/lib/mysql
+      - $PWD/_tools/mysql/conf.d:/etc/mysql/conf.d:cached
+    ports:
+      - "33306:3306"
+  memo-redis:
+    image: "redis:latest"
+    container_name: memo-redis
+    ports:
+      - "36379:6379"
+    volumes:
+      - memo-redis-data:/data
+  mongo:
+    image: mongo
+    container_name: mongo_db
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongodb_data:/data/db
+      - ./configdb:/data/configdb
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo_express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_SERVER: mongo
+    depends_on:
+      - mongo
+volumes:
+  memo-db-data:
+  memo-redis-data:
