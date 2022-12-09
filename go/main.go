@@ -1,20 +1,34 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
-	"os"
+
+	"golang.org/x/net/websocket"
 )
 
+var dataCh chan Data
+
+type Data struct {
+	MyData string `json:"myData"`
+}
+
 func main() {
-	err := http.ListenAndServe(
-		":8080",
-		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprintf(w, "Hello, %s!", r.URL.Path[1:])
-		}),
-	)
+	dataCh = make(chan Data, 1)
+
+	http.Handle("/ws", websocket.Handler(dataHandler))
+	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
-		fmt.Printf("failed to terminate server: %v", err)
-		os.Exit(1)
+		log.Fatal(err)
+	}
+}
+
+func dataHandler(ws *websocket.Conn) {
+	for data := range dataCh {
+		err := websocket.JSON.Send(ws, data)
+		if err != nil {
+			log.Printf("error sending data: %v\n", err)
+			return
+		}
 	}
 }
