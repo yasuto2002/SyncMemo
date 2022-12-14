@@ -29,7 +29,8 @@ export default defineNuxtConfig({
     // Keys within public, will be also exposed to the client-side
     public: {
       apiServer: process.env.APISERVER,
-      apiContainer: process.env.APICONTAINER
+      apiContainer: process.env.APICONTAINER,
+      socket: process.env.SOCKET
     }
   },
   alias: {

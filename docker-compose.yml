@@ -8,6 +8,8 @@ services:
       - 3000:3000
       - 24678:24678
       - 4000:4000
+    networks:
+      - external-api
     volumes:
       - ./app:/app
     stdin_open: true
@@ -33,7 +35,9 @@ services:
     volumes:
       - ./go:/app
     ports:
-      - "18000:8080"
+      - "8080:8080"
+    networks:
+      - external-api
   memo-db:
     image: mysql:8.0.29
     platform: linux/x86_64
@@ -48,11 +52,15 @@ services:
       - $PWD/_tools/mysql/conf.d:/etc/mysql/conf.d:cached
     ports:
       - "33306:3306"
+    networks:
+      - external-api
   memo-redis:
     image: "redis:latest"
     container_name: memo-redis
     ports:
       - "36379:6379"
+    networks:
+      - external-api
     volumes:
       - memo-redis-data:/data
   mongo:
@@ -64,6 +72,10 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
     ports:
       - 27017:27017
+    networks:
+      - external-api
+    networks:
+      - external-api
     volumes:
       - ./mongodb_data:/data/db
       - ./configdb:/data/configdb
@@ -74,6 +86,8 @@ services:
     restart: always
     ports:
       - 8081:8081
+    networks:
+      - external-api
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: password
@@ -83,3 +97,7 @@ services:
 volumes:
   memo-db-data:
   memo-redis-data:
+
+networks:
+  external-api:
+    external: true

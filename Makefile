@@ -21,6 +21,9 @@ logs: ## Tail docker compose logs
 exec:
 	docker compose exec app bash
 
+goexec:
+	docker compose exec go bash
+
 ps: ## Check container status
 	docker compose ps
 

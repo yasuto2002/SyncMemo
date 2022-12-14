@@ -10,13 +10,15 @@
     "autoprefixer": "^10.4.8",
     "nuxt": "3.0.0-rc.6",
     "postcss": "^8.4.16",
-    "tailwindcss": "^3.1.8"
+    "tailwindcss": "^3.1.8",
+    "websocket": "^1.0.34"
   },
   "dependencies": {
     "axios": "^0.27.2",
     "daisyui": "^2.38.0",
     "socket.io-client": "^4.5.1",
     "vee-validate": "^4.6.6",
+    "@types/websocket": "^1.0.5",
     "yup": "^0.32.11"
   }
 }
