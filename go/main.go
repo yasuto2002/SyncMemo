@@ -1,34 +1,45 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
+	"os"
 
-	"golang.org/x/net/websocket"
+	"github.com/gorilla/mux"
 )
 
-var dataCh chan Data
+const (
+	readBuffSize = 2 << 10
+	writeBuffSize
+)
 
-type Data struct {
-	MyData string `json:"myData"`
-}
+const (
+	nameHeader = "WS-NAME"
+	idHeader   = "WS-ID"
+)
+
+var port string
 
 func main() {
-	dataCh = make(chan Data, 1)
 
-	http.Handle("/ws", websocket.Handler(dataHandler))
-	err := http.ListenAndServe(":8080", nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
+	log.SetOutput(os.Stdout)
 
-func dataHandler(ws *websocket.Conn) {
-	for data := range dataCh {
-		err := websocket.JSON.Send(ws, data)
-		if err != nil {
-			log.Printf("error sending data: %v\n", err)
-			return
-		}
-	}
+	flag.StringVar(&port, "p", "8080", "port")
+	flag.Parse()
+
+	r := mux.NewRouter()
+
+	chatroom := r.PathPrefix("/chatroom").Subrouter()
+	chatroom.HandleFunc("/create/{name}", CR(CreateChatroom)).Methods(http.MethodPost)
+	chatroom.HandleFunc("/list", CR(ListChatroom)).Methods(http.MethodGet)
+	chatroom.HandleFunc("/connect", clientMW(chatroomWSHandler))
+
+	client := r.PathPrefix("/client").Subrouter()
+	client.HandleFunc("/list", ListAllClients).Methods(http.MethodGet)
+
+	log.Println("Registered Handlers")
+
+	log.Printf("Started Server on port : %v", port)
+	http.ListenAndServe(":"+port, r)
 }
