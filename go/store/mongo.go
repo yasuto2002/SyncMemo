@@ -1,4 +1,4 @@
-package model
+package store
 
 import (
 	"context"
@@ -8,11 +8,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func Connect() (context.Context, *mongo.Database, func()) {
+func Connect(info string) (context.Context, *mongo.Database, func()) {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	// defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://test:test@mongo:27017/test"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(info))
 
 	if err != nil {
 		fmt.Print(err)

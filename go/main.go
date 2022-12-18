@@ -2,14 +2,16 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 
 	"github.com/gorilla/mux"
 
+	"syncmemo/config"
 	"syncmemo/handler"
-	"syncmemo/model"
+	"syncmemo/store"
 )
 
 const (
@@ -25,13 +27,17 @@ const (
 var port string
 
 func main() {
+	cfg, err := config.New()
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	log.SetOutput(os.Stdout)
 
-	flag.StringVar(&port, "p", "8080", "port")
+	flag.StringVar(&port, "p", cfg.Port, "port")
 	flag.Parse()
 
-	ctx, db, close := model.Connect()
+	ctx, db, close := store.Connect(cfg.Mongo)
 	defer close()
 	r := mux.NewRouter()
 
