@@ -7,6 +7,9 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
+
+	"syncmemo/handler"
+	"syncmemo/model"
 )
 
 const (
@@ -28,6 +31,8 @@ func main() {
 	flag.StringVar(&port, "p", "8080", "port")
 	flag.Parse()
 
+	ctx, db, close := model.Connect()
+	defer close()
 	r := mux.NewRouter()
 
 	chatroom := r.PathPrefix("/chatroom").Subrouter()
@@ -37,6 +42,9 @@ func main() {
 
 	client := r.PathPrefix("/client").Subrouter()
 	client.HandleFunc("/list", ListAllClients).Methods(http.MethodGet)
+
+	t := &handler.Test{DB: db, CTX: ctx}
+	r.HandleFunc("/test", t.ServeHTTP).Methods(http.MethodGet)
 
 	log.Println("Registered Handlers")
 
