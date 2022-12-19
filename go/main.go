@@ -7,11 +7,12 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gorilla/mux"
-
 	"syncmemo/config"
 	"syncmemo/handler"
 	"syncmemo/store"
+
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 )
 
 const (
@@ -55,5 +56,8 @@ func main() {
 	log.Println("Registered Handlers")
 
 	log.Printf("Started Server on port : %v", port)
-	http.ListenAndServe(":"+port, r)
+	headersOk := handlers.AllowedHeaders([]string{"*"})
+	originsOk := handlers.AllowedOrigins([]string{"*"})
+	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
+	http.ListenAndServe(":"+port, handlers.CORS(headersOk, originsOk, methodsOk)(r))
 }
