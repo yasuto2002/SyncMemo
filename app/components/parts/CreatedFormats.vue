@@ -16,6 +16,7 @@
             rounded-[10px]
             h-10
             "
+            v-model="boardName"
             /><br />
             <input type="checkbox" id="validity" v-model="checked"/>
             <label for="validity">パスワードを有効にする</label>
@@ -35,6 +36,7 @@
             "
             v-bind:class= "{'border-[#ACA5A5]' : checked}"
             :disabled="!checked"
+            v-model="boardPassword"
         />
         </div>
         <div class="w-full flex justify-center">
@@ -51,6 +53,7 @@
                 text-white
             "
             type="button"
+            @click="click"
             >
             作る
             </button>
@@ -58,5 +61,25 @@
     </form>
 </template>
 <script setup lang="ts">
+import makeBoard from '~~/plugins/makeBoard';
+import type { Ref } from 'vue';
+const boardName:Ref<string> = ref("")
+const boardPassword:Ref<string> = ref("")
+const router = useRouter();
 const checked = useState('ref1-key', () => false)
+const { $makeBoard } = useNuxtApp()
+
+const click = async() =>{
+    const { data, pending, refresh, error }  = await useFetch("http://localhost:8080/makeBoard", { method: 'POST', body: {Name : boardName.value,Password:boardPassword.value } });
+    if(error.value){
+        console.log(error.value)
+        router.push("/error")
+        return
+    }
+    let id:any = data.value
+    let idJ = JSON.parse(id)
+    console.log(idJ.ID)
+    refresh();
+    router.push({ path: 'board',query: { id: idJ.ID }})
+}
 </script>

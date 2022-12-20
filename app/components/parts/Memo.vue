@@ -4,11 +4,11 @@
     id="red-box"
     ref="memo"
   >
-    <p v-if="view" class="w-full h-full p-[5%]">{{ data.memo.text }}</p>
+    <p v-if="view" class="w-full h-full p-[5%]">{{ data.text }}</p>
     <textarea
       name=""
       id=""
-      v-model="props.data.memo.text"
+      v-model="data.text"
       v-if="!view"
       class="resize-none focus:outline-none w-full h-full p-[5%]"
       @blur="out"
@@ -18,40 +18,40 @@
 </template>
 <script setup>
 const memo = ref(null);
-let text = ref("");
+// let text = ref("");
 let view = ref(true);
-const divs = ref([]);
+// const divs = ref([]);
 const out = () => {
   view.value = !view.value;
-  let memoData = {
-      id: props.data.memo.id,
-      text: props.data.memo.text,
-      x:x.value,
-      y:y.value,
-  };
-  emit("moveMemo",memoData)
+  // let memoData = {
+  //     id: props.data.memo.id,
+  //     text: props.data.memo.text,
+  //     x:x.value,
+  //     y:y.value,
+  // };
+  // emit("moveMemo",memoData)
 };
 const input = () =>{
-  let memoData = {
-      id: props.data.memo._id,
-      text: props.data.memo.text,
-      x:y.value,
-      y:x.value,
-  };
-  emit("moveMemo",memoData)
+  // let memoData = {
+  //     id: props.data.memo._id,
+  //     text: props.data.memo.text,
+  //     x:y.value,
+  //     y:x.value,
+  // };
+  // emit("moveMemo",memoData)
 }
 const props = defineProps({
   data: { type: Object, required: true },
 });
 let x = ref(0)
 let y = ref(0)
-const emit = defineEmits();
+// const emit = defineEmits();
 
 onMounted(() => {
   var kx;
   var ky;
-  memo.value.style.top = props.data.memo.x + 'px'
-  memo.value.style.left = props.data.memo.y + 'px'
+  // memo.value.style.top = props.data.memo.x + 'px'
+  // memo.value.style.left = props.data.memo.y + 'px'
   var el = memo;
   //マウスが要素内で押されたとき、又はタッチされたとき発火
   memo.value.addEventListener("mousedown", mdown)
@@ -102,7 +102,7 @@ onMounted(() => {
       x:y.value,
       y:x.value,
     };
-    emit("moveMemo",memoData)
+    // emit("moveMemo",memoData)
     //マウスボタンが離されたとき、またはカーソルが外れたとき発火
     memo.value.addEventListener("mouseup", mup, false);
     document.body.addEventListener("mouseleave", mup, false);
