@@ -17,7 +17,9 @@
   </div>
 </template>
 <script setup>
+import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 const route = useRoute()
+const router = useRouter();
 const id = route.query.id;
 // import { io } from "socket.io-client";
 // const config = useRuntimeConfig();
@@ -68,9 +70,39 @@ const coll = () => {
 //   socket.emit("moveMemo",data);
 // };
 const memoel = ref([]);
-onMounted(() => {
-  console.log(id)
-});
+const config = useRuntimeConfig()
+  const ws = new WebSocket(config.socket + "/chatroom/connect?name=room1&chatroom_id=39646630-d589-400c-ac86-9a405fa20bfd")
+  ws.onopen = function () {
+      console.log("接続が開かれたときに呼び出されるイベント")
+      send()
+  }
+  ws.onmessage = function (event) {
+    var obj = JSON.parse(event.data)
+    console.log(obj)
+  }
+  var send =() => {
+      let send_msg = "aaaa"
+      ws.send(send_msg)
+  }
+onMounted( async() => {
+  // const config = useRuntimeConfig()
+  // const ws = new WebSocket(config.socket + "/chatroom/connect?name=room1&chatroom_id=39646630-d589-400c-ac86-9a405fa20bfd")
+  // ws.onopen = function () {
+  //     console.log("接続が開かれたときに呼び出されるイベント")
+  //     send()
+  // }
+  // ws.onmessage = function (event) {
+  //   var obj = JSON.parse(event.data)
+  //   console.log(obj)
+  // }
+  // var send =() => {
+  //     let send_msg = "aaaa"
+  //     ws.send(send_msg)
+  // }
+})
+onBeforeRouteUpdate((to, from, next) => {
+  id = to.query.id
+})
 defineExpose({
   coll,
 });
