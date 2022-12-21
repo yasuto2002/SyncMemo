@@ -56,10 +56,13 @@ func main() {
 	b := &handler.MakeBoard{DB: db, CTX: ctx}
 	r.HandleFunc("/makeBoard", b.ServeHTTP).Methods(http.MethodPost)
 
+	bl := &handler.BoardList{DB: db, CTX: ctx}
+	r.HandleFunc("/boardList", bl.ServeHTTP).Methods(http.MethodPost)
+
 	log.Println("Registered Handlers")
 
 	log.Printf("Started Server on port : %v", port)
-	headers := handlers.AllowedHeaders([]string{"Accept", "Content-Type", "*"})
+	headers := handlers.AllowedHeaders([]string{"*", "Content-Type", "*"})
 	origins := handlers.AllowedOrigins([]string{"*"})
 	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
 	http.ListenAndServe(":"+port, handlers.CORS(headers, origins, methodsOk)(r))
