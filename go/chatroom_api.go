@@ -42,13 +42,19 @@ func CreateChatroom(crmd CRMiddlewareData, rw http.ResponseWriter) {
 	}
 
 	//Create the chatroom.
+
+	if _, ok := rooms.Data[ChatroomID(crName)]; ok {
+		rw.Write([]byte(`{"status":"exists"}`))
+		return
+	}
+
 	crid := rooms.create(crName)
 
 	log.Printf("Created Chatroom : %v", crName)
 
 	r := CRResponse{}
 	r.CRID = crid
-	r.Status = "Success"
+	r.Status = "success"
 
 	out, err := json.Marshal(r)
 	if err != nil {

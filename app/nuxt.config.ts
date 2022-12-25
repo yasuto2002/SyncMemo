@@ -12,6 +12,7 @@ export default defineNuxtConfig({
     '@/assets/css/main.css'
   ],
 
+  ssr: false,
   // 追加
   build: {
     postcss: {

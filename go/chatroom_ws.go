@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
 
@@ -38,10 +37,10 @@ type Rooms struct {
 }
 
 type ChatData struct {
-	Type    string   `json:"type"` //control or text
-	Name    string   `json:"sender_name,omitempty"`
-	ID      ClientID `json:"sender_id,omitempty"`
-	Message string   `json:"message,omitempty"`
+	Type string   `json:"type"` //control or text
+	Name string   `json:"sender_name,omitempty"`
+	ID   ClientID `json:"sender_id,omitempty"`
+	Data string   `json:"data,omitempty"`
 }
 
 func (cd ChatData) Marshal() []byte {
@@ -57,8 +56,8 @@ func (cd ChatData) String() string {
 // create creates a chatroom and allocates memory.
 func (r *Rooms) create(name string) ChatroomID {
 
-	crID := ChatroomID(uuid.New().String())
-
+	// crID := ChatroomID(uuid.New().String())
+	crID := ChatroomID(name)
 	r.Lock()
 	defer r.Unlock()
 
@@ -141,10 +140,10 @@ func (c *Chatroom) broadcaster(wg *sync.WaitGroup) {
 			}
 
 			chat := ChatData{ //Create chat data and write to connections
-				Name:    b.Cname,
-				ID:      b.Cid,
-				Message: string(b.Message),
-				Type:    "text",
+				Name: b.Cname,
+				ID:   b.Cid,
+				Data: string(b.Message),
+				Type: "text",
 			}
 
 			if err := cl.Conn.WriteJSON(chat); err != nil {
@@ -202,14 +201,14 @@ func chatroomWSHandler(cl *Client, rw http.ResponseWriter, r *http.Request) {
 
 	if crid == "" { //If chatroom id is blank then write a control message
 		log.Printf("Got Chatroom ID : %v", crid)
-		data := ChatData{Type: "control", Message: "name or chatroom_id empty"}
+		data := ChatData{Type: "control", Data: "name or chatroom_id empty"}
 		cl.Conn.WriteJSON(data)
 		return
 	}
 
 	if !chatroomExists(ChatroomID(crid)) { //If chatroom does not exist then write a control message
 		log.Printf("Chatroom ID : %v does not exist", crid)
-		data := ChatData{Type: "control", Message: "given chatroom does not exist"}
+		data := ChatData{Type: "control", Data: "given chatroom does not exist"}
 		cl.Conn.WriteJSON(data)
 		return
 	}

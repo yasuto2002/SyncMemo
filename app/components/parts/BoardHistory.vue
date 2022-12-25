@@ -21,7 +21,8 @@
         // router.push("/error")
         // return
     }
-    console.log(data.value)
+    let jData = JSON.parse(data.value)
+    boards.value = jData.boards
     refresh();
   watch(data, (newData) => {
     let jData = JSON.parse(data.value)

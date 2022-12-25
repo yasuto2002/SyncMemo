@@ -13,14 +13,49 @@
           if (el) memoel[0] = el;
         }
       "
+      @moveMemo="moveMemo"
     />
   </div>
 </template>
 <script setup>
-import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 const route = useRoute()
-const router = useRouter();
 const id = route.query.id;
+const router = useRouter();
+const memoel = ref([]);
+let memos = ref([])
+const createRoom = async() =>{
+    const { data, pending, refresh, error }  = await useFetch(`http://localhost:8080/chatroom/create/${id}`, { method: 'POST' });
+    if(error.value){
+        console.log(error.value)
+        router.push("/error")
+        return
+    }
+    let re = JSON.parse(data.value)
+    if(re.status != 'success'){
+      return
+    }
+    refresh()
+}
+createRoom()
+
+const config = useRuntimeConfig()
+const ws = new WebSocket(config.socket + `/chatroom/connect?name=${id}&chatroom_id=${id}`)
+ws.onopen = function () {
+    console.log("接続が開かれたときに呼び出されるイベント")
+    send()
+}
+ws.onmessage = function (event) {
+  let info = JSON.parse(event.data)
+  info = JSON.parse(info.data)
+  memos.value[0].x = info.x
+  memos.value[0].y = info.y
+  console.log(memos.value)
+}
+var send =() => {
+    let send_msg = "aaaa"
+    ws.send(send_msg)
+}
+
 // import { io } from "socket.io-client";
 // const config = useRuntimeConfig();
 // const socket = io(config.apiServer);
@@ -32,7 +67,6 @@ const nuxtApp = useNuxtApp();
 // let { socket, makeMemo, sendMemo } = await nuxtApp.$makeSoket();
 let apiData = await nuxtApp.$reqApi();
 // console.log(apiData);
-let memos = ref([])
 // const getMemos = async() =>{
 //   let {data}= await useFetch(`${config.apiServer}/getMemo`
 //   )
@@ -50,9 +84,10 @@ const coll = () => {
   memos.value.push({
       id: 0,
       text: "",
-      x:0,
-      y:0,
+      x:10,
+      y:10,
   })
+  console.log(memos.value)
 };
 // socket.on("preservation", (data) => {
 //   id = data;
@@ -66,42 +101,14 @@ const coll = () => {
 //   memos.value = receiveData.memos;
 //   refresh()
 // });
-// const moveMemo = (data) => {
-//   socket.emit("moveMemo",data);
-// };
-const memoel = ref([]);
-const config = useRuntimeConfig()
-  const ws = new WebSocket(config.socket + "/chatroom/connect?name=room1&chatroom_id=39646630-d589-400c-ac86-9a405fa20bfd")
-  ws.onopen = function () {
-      console.log("接続が開かれたときに呼び出されるイベント")
-      send()
-  }
-  ws.onmessage = function (event) {
-    var obj = JSON.parse(event.data)
-    console.log(obj)
-  }
-  var send =() => {
-      let send_msg = "aaaa"
-      ws.send(send_msg)
-  }
+const moveMemo = (data) => {
+  memos.value[0].x = data.x
+  memos.value[0].y = data.y
+  ws.send(JSON.stringify(data))
+  console.log(memos.value)
+};
+
 onMounted( async() => {
-  // const config = useRuntimeConfig()
-  // const ws = new WebSocket(config.socket + "/chatroom/connect?name=room1&chatroom_id=39646630-d589-400c-ac86-9a405fa20bfd")
-  // ws.onopen = function () {
-  //     console.log("接続が開かれたときに呼び出されるイベント")
-  //     send()
-  // }
-  // ws.onmessage = function (event) {
-  //   var obj = JSON.parse(event.data)
-  //   console.log(obj)
-  // }
-  // var send =() => {
-  //     let send_msg = "aaaa"
-  //     ws.send(send_msg)
-  // }
-})
-onBeforeRouteUpdate((to, from, next) => {
-  id = to.query.id
 })
 defineExpose({
   coll,
