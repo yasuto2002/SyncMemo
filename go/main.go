@@ -41,7 +41,7 @@ func main() {
 	ctx, db, close := store.Connect(cfg.Mongo)
 	defer close()
 	r := mux.NewRouter()
-
+	r.Use(commonMiddleware)
 	chatroom := r.PathPrefix("/chatroom").Subrouter()
 	chatroom.HandleFunc("/create/{name}", CR(CreateChatroom)).Methods(http.MethodPost)
 	chatroom.HandleFunc("/list", CR(ListChatroom)).Methods(http.MethodGet)
@@ -66,4 +66,11 @@ func main() {
 	origins := handlers.AllowedOrigins([]string{"*"})
 	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
 	http.ListenAndServe(":"+port, handlers.CORS(headers, origins, methodsOk)(r))
+}
+
+func commonMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+		next.ServeHTTP(w, r)
+	})
 }
