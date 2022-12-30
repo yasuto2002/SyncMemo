@@ -8,10 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func Connect(info string) (context.Context, *mongo.Database, func()) {
-	ctx := context.Background()
-	ctx, cancel := context.WithCancel(ctx)
-	// defer cancel()
+func Connect(info string, ctx context.Context) (*mongo.Database, *mongo.Client) {
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(info))
 
 	if err != nil {
@@ -20,8 +17,5 @@ func Connect(info string) (context.Context, *mongo.Database, func()) {
 	}
 
 	database := client.Database("test")
-	return ctx, database, func() {
-		cancel()
-		client.Disconnect(ctx)
-	}
+	return database, client
 }

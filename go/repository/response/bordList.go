@@ -1,7 +1,8 @@
 package response
 
-import "go.mongodb.org/mongo-driver/bson"
-
 type BoardList struct {
-	Boards []bson.M `json:"boards"`
+	Id      string `bson:"_id" json:"id"`
+	Name    string `bson:"name" json:"name"`
+	Mail    string `bson:"mail" json:"Mail"`
+	Paaword string `bson:"paaword" json:"paaword"`
 }
