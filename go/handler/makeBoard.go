@@ -1,9 +1,7 @@
 package handler
 
 import (
-	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -15,23 +13,23 @@ import (
 )
 
 type MakeBoard struct {
-	DB  *mongo.Database
-	CTX context.Context
+	DB *mongo.Database
 }
 
 func (B *MakeBoard) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	var item request.Make
 	if err := json.Unmarshal(reqBody, &item); err != nil {
 		log.Fatal(err)
 	}
-	id := model.MakeBords(B.CTX, B.DB, item)
-	re := response.Make{ID: id}
-	data, err := json.Marshal(re)
+	id, err := model.MakeBords(ctx, B.DB, item)
 	if err != nil {
-		fmt.Println(err)
+		RespondJSON(ctx, rw, &ErrResponse{
+			Message: err.Error(),
+		}, http.StatusInternalServerError)
 		return
 	}
-	rw.WriteHeader(http.StatusOK)
-	rw.Write(data)
+	re := response.Make{ID: id}
+	RespondJSON(ctx, rw, re, http.StatusOK)
 }

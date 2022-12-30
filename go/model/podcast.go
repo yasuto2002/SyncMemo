@@ -15,7 +15,7 @@ type Podcast struct {
 	Tags   []string           `bson:"tags,omitempty"`
 }
 
-func MakePodcast(ctx context.Context, db *mongo.Database) {
+func MakePodcast(ctx context.Context, db *mongo.Database) error {
 	podcastsCollection := db.Collection("podcasts")
 	podcast := Podcast{
 		Title:  "The Polyglot Developer",
@@ -28,4 +28,5 @@ func MakePodcast(ctx context.Context, db *mongo.Database) {
 		panic(err)
 	}
 	fmt.Println(insertResult.InsertedID)
+	return nil
 }

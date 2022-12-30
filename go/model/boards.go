@@ -3,7 +3,6 @@ package model
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"syncmemo/entity"
 	"syncmemo/repository/request"
@@ -14,7 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func MakeBords(ctx context.Context, db *mongo.Database, item request.Make) string {
+func MakeBords(ctx context.Context, db *mongo.Database, item request.Make) (string, error) {
 	podcastsCollection := db.Collection("boards")
 	board := entity.Board{
 		NAME:     item.Name,
@@ -23,23 +22,22 @@ func MakeBords(ctx context.Context, db *mongo.Database, item request.Make) strin
 	}
 	insertResult, err := podcastsCollection.InsertOne(ctx, board)
 	if err != nil {
-		fmt.Println(err)
-		panic(err)
+		return "", fmt.Errorf("MakeBords")
 	}
 	fmt.Println(insertResult.InsertedID)
-	return insertResult.InsertedID.(primitive.ObjectID).Hex()
+	return insertResult.InsertedID.(primitive.ObjectID).Hex(), nil
 }
 
-func GetBoardList(ctx context.Context, db *mongo.Database) []response.BoardList {
+func GetBoardList(ctx context.Context, db *mongo.Database) ([]response.BoardList, error) {
 	filter := &bson.D{}
 	boardsCollection := db.Collection("boards")
 	cursor, err := boardsCollection.Find(ctx, filter)
 	if err != nil {
-		log.Fatal(err)
+		return nil, fmt.Errorf("FindError")
 	}
 	var boards []response.BoardList
 	if err = cursor.All(ctx, &boards); err != nil {
-		log.Fatal(err)
+		return nil, fmt.Errorf("FindError")
 	}
-	return boards
+	return boards, nil
 }

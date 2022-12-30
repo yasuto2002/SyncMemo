@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -37,9 +38,12 @@ func main() {
 
 	flag.StringVar(&port, "p", cfg.Port, "port")
 	flag.Parse()
-
-	ctx, db, close := store.Connect(cfg.Mongo)
-	defer close()
+	ctx, cancel := context.WithCancel(context.Background())
+	db, client := store.Connect(cfg.Mongo, ctx)
+	defer func() {
+		cancel()
+		client.Disconnect(ctx)
+	}()
 	r := mux.NewRouter()
 	r.Use(commonMiddleware)
 	chatroom := r.PathPrefix("/chatroom").Subrouter()
@@ -47,16 +51,16 @@ func main() {
 	chatroom.HandleFunc("/list", CR(ListChatroom)).Methods(http.MethodGet)
 	chatroom.HandleFunc("/connect", clientMW(chatroomWSHandler))
 
-	client := r.PathPrefix("/client").Subrouter()
-	client.HandleFunc("/list", ListAllClients).Methods(http.MethodGet)
+	cl := r.PathPrefix("/client").Subrouter()
+	cl.HandleFunc("/list", ListAllClients).Methods(http.MethodGet)
 
 	t := &handler.Test{DB: db, CTX: ctx}
 	r.HandleFunc("/test", t.ServeHTTP).Methods(http.MethodGet)
 
-	b := &handler.MakeBoard{DB: db, CTX: ctx}
+	b := &handler.MakeBoard{DB: db}
 	r.HandleFunc("/makeBoard", b.ServeHTTP).Methods(http.MethodPost)
 
-	bl := &handler.BoardList{DB: db, CTX: ctx}
+	bl := &handler.BoardList{DB: db}
 	r.HandleFunc("/boardList", bl.ServeHTTP).Methods(http.MethodPost)
 
 	log.Println("Registered Handlers")
