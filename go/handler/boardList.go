@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"syncmemo/model"
-	"syncmemo/repository/response"
 
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -20,14 +19,13 @@ func (B *BoardList) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 	d := model.GetBoardList(B.CTX, B.DB)
 	// re := response.Make{ID: id}
-	j := response.BoardList{Boards: d}
-	data, err := json.Marshal(j)
+	// j := response.BoardList{Boards: d}
+	data, err := json.Marshal(d)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	rw.WriteHeader(http.StatusOK)
-	rw.Header().Set("Content-Type", "application/json; charset=utf-8")
 	if _, err := fmt.Fprintf(rw, "%s", data); err != nil {
 		fmt.Printf("write response error: %v", err)
 	}

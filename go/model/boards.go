@@ -7,6 +7,7 @@ import (
 
 	"syncmemo/entity"
 	"syncmemo/repository/request"
+	"syncmemo/repository/response"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -29,15 +30,16 @@ func MakeBords(ctx context.Context, db *mongo.Database, item request.Make) strin
 	return insertResult.InsertedID.(primitive.ObjectID).Hex()
 }
 
-func GetBoardList(ctx context.Context, db *mongo.Database) []bson.M {
-	podcastsCollection := db.Collection("boards")
-	cursor, err := podcastsCollection.Find(ctx, bson.M{})
+func GetBoardList(ctx context.Context, db *mongo.Database) []response.BoardList {
+	filter := &bson.D{}
+	boardsCollection := db.Collection("boards")
+	cursor, err := boardsCollection.Find(ctx, filter)
 	if err != nil {
 		log.Fatal(err)
 	}
-	var podcasts []bson.M
-	if err = cursor.All(ctx, &podcasts); err != nil {
+	var boards []response.BoardList
+	if err = cursor.All(ctx, &boards); err != nil {
 		log.Fatal(err)
 	}
-	return podcasts
+	return boards
 }
