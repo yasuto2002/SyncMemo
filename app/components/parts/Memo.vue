@@ -18,9 +18,7 @@
 </template>
 <script setup>
 const memo = ref(null);
-// let text = ref("");
 let view = ref(true);
-// const divs = ref([]);
 const out = () => {
   view.value = !view.value;
   let memoData = {

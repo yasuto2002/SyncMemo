@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"syncmemo/model"
 	"syncmemo/repository/request"
-	"syncmemo/repository/response"
 
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -30,6 +29,5 @@ func (B *MakeBoard) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		}, http.StatusInternalServerError)
 		return
 	}
-	re := response.Make{ID: id}
-	RespondJSON(ctx, rw, re, http.StatusOK)
+	RespondJSON(ctx, rw, id, http.StatusOK)
 }

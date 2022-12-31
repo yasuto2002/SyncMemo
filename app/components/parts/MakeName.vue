@@ -15,10 +15,10 @@
     </p>
   </div>
 </template>
-<script setup>
-const test = ref([]);
+<script setup lang="ts">
+import type { Ref,ComponentPublicInstance } from 'vue';
 const list = reactive([1]);
-const divs = ref([]);
+const divs:Ref<Element | ComponentPublicInstance[]> = ref([]);
 onMounted(() => {
   console.log(divs.value[0].style);
 });

@@ -26,31 +26,10 @@
     </div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 const root = ref(null);
-import { io } from "socket.io-client";
 const config = useRuntimeConfig();
-const socket = io(config.apiServer);
 let memos = ref();
-const sendPosition = (position) => {
-  socket.emit("pass", position);
-};
-socket.on("first", (data) => {
-  memos.value = data;
-});
-socket.on("reception", (data) => {
-  root.value.style.left = data.y;
-  root.value.style.top = data.x;
-});
-socket.on("addMemo", (data) => {
-  memos.value = data.Memo;
-});
-socket.on("receiveData", (data) => {
-  memos.value[data.memoData.id] = data.memoData
-});
-
-
-
 </script>
 <style scoped>
 .drag-and-drop {
