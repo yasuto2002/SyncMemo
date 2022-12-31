@@ -6,7 +6,7 @@
     </div>
   </header>
 </template>
-<script setup>
+<script setup lang="ts">
   const authStore = useAuthStore()
   const {authState, authLogout} = authStore
   const loginStatus = ref(computed(() => authState.value))

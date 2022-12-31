@@ -53,7 +53,7 @@
                 text-white
             "
             type="button"
-            @click="click"
+            @click="make"
             >
             作る
             </button>
@@ -62,6 +62,7 @@
 </template>
 <script setup lang="ts">
 import makeBoard from '~~/plugins/makeBoard';
+import type {makeBoardRes} from '../../repository/respons/makeBoard';
 import type { Ref } from 'vue';
 const boardName:Ref<string> = ref("")
 const boardPassword:Ref<string> = ref("")
@@ -69,17 +70,13 @@ const router = useRouter();
 const checked = useState('ref1-key', () => false)
 const { $makeBoard } = useNuxtApp()
 
-const click = async() =>{
-    const { data, pending, refresh, error }  = await useFetch("http://localhost:8080/makeBoard", { method: 'POST', body: {Name : boardName.value,Password:boardPassword.value } });
-    if(error.value){
-        console.log(error.value)
+const make = async() =>{
+    const { $makeBoard } = useNuxtApp()
+    const id:makeBoardRes = await $makeBoard(boardName.value,boardPassword.value)
+    if(id === null){
         router.push("/error")
         return
     }
-    let id:any = data.value
-    let idJ = JSON.parse(id)
-    console.log(idJ.ID)
-    refresh();
-    router.push({ path: 'board',query: { id: idJ.ID }})
+    router.push({ path: 'board',query: { id: id.id }})
 }
 </script>

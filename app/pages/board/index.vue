@@ -10,8 +10,9 @@
     <templateBoard ref="childRef" />
   </div>
 </template>
-<script setup>
-const childRef = ref();
+<script setup lang="ts">
+import type { Ref } from 'vue';
+const childRef:Ref = ref();
 
 const onChildMethodClick = () => {
   childRef.value.coll();

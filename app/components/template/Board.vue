@@ -18,51 +18,26 @@
   </div>
 </template>
 <script setup>
+
 const route = useRoute()
 const id = route.query.id;
 const router = useRouter();
 const memoel = ref([]);
 let memos = ref([])
-const createRoom = async() =>{
-    const { data, pending, refresh, error }  = await useFetch(`http://localhost:8080/chatroom/create/${id}`, { method: 'POST' });
-    if(error.value){
-        console.log(error.value)
-        router.push("/error")
-        return
-    }
-    let re = JSON.parse(data.value)
-    if(re.status != 'success'){
-      return
-    }
-    refresh()
-}
-createRoom()
-
 const config = useRuntimeConfig()
+const { $createRoom } = useNuxtApp()
+$createRoom(id)
+
 const ws = new WebSocket(config.socket + `/chatroom/connect?name=${id}&chatroom_id=${id}`)
 ws.onopen = function () {
     console.log("接続が開かれたときに呼び出されるイベント")
-    send()
 }
 ws.onmessage = function (event) {
   let info = JSON.parse(event.data)
   info = JSON.parse(info.data)
   memos.value[0].x = info.x
   memos.value[0].y = info.y
-  console.log(memos.value)
 }
-var send =() => {
-    let send_msg = "aaaa"
-    ws.send(send_msg)
-}
-
-// import { io } from "socket.io-client";
-// const config = useRuntimeConfig();
-// const socket = io(config.apiServer);
-// const sendPosition = (position) => {
-//   socket.emit("pass", position);
-// }
-// const config = useRuntimeConfig();
 const nuxtApp = useNuxtApp();
 // let { socket, makeMemo, sendMemo } = await nuxtApp.$makeSoket();
 let apiData = await nuxtApp.$reqApi();

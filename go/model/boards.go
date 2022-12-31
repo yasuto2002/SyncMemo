@@ -13,7 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func MakeBords(ctx context.Context, db *mongo.Database, item request.Make) (string, error) {
+func MakeBords(ctx context.Context, db *mongo.Database, item request.Make) (response.Make, error) {
 	podcastsCollection := db.Collection("boards")
 	board := entity.Board{
 		NAME:     item.Name,
@@ -22,10 +22,10 @@ func MakeBords(ctx context.Context, db *mongo.Database, item request.Make) (stri
 	}
 	insertResult, err := podcastsCollection.InsertOne(ctx, board)
 	if err != nil {
-		return "", fmt.Errorf("MakeBords")
+		return response.Make{ID: ""}, fmt.Errorf("MakeBords")
 	}
 	fmt.Println(insertResult.InsertedID)
-	return insertResult.InsertedID.(primitive.ObjectID).Hex(), nil
+	return response.Make{ID: insertResult.InsertedID.(primitive.ObjectID).Hex()}, nil
 }
 
 func GetBoardList(ctx context.Context, db *mongo.Database) ([]response.BoardList, error) {
