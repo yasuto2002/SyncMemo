@@ -3,16 +3,17 @@ package handler
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"syncmemo/model"
 	"syncmemo/repository/request"
 
+	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type MakeBoard struct {
-	DB *mongo.Database
+	DB        *mongo.Database
+	Validator *validator.Validate
 }
 
 func (B *MakeBoard) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
@@ -20,8 +21,19 @@ func (B *MakeBoard) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	var item request.Make
 	if err := json.Unmarshal(reqBody, &item); err != nil {
-		log.Fatal(err)
+		RespondJSON(ctx, rw, &ErrResponse{
+			Message: err.Error(),
+		}, http.StatusInternalServerError)
+		return
 	}
+
+	if err := B.Validator.Struct(item); err != nil {
+		RespondJSON(ctx, rw, &ErrResponse{
+			Message: err.Error(),
+		}, http.StatusBadRequest)
+		return
+	}
+
 	id, err := model.MakeBords(ctx, B.DB, item)
 	if err != nil {
 		RespondJSON(ctx, rw, &ErrResponse{

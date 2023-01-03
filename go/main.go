@@ -12,6 +12,7 @@ import (
 	"syncmemo/handler"
 	"syncmemo/store"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
@@ -46,6 +47,8 @@ func main() {
 	}()
 	r := mux.NewRouter()
 	r.Use(commonMiddleware)
+	v := validator.New()
+
 	chatroom := r.PathPrefix("/chatroom").Subrouter()
 	chatroom.HandleFunc("/create/{name}", CR(CreateChatroom)).Methods(http.MethodPost)
 	chatroom.HandleFunc("/list", CR(ListChatroom)).Methods(http.MethodGet)
@@ -54,10 +57,10 @@ func main() {
 	cl := r.PathPrefix("/client").Subrouter()
 	cl.HandleFunc("/list", ListAllClients).Methods(http.MethodGet)
 
-	t := &handler.Test{DB: db, CTX: ctx}
+	t := &handler.Test{DB: db, CTX: ctx, Validator: v}
 	r.HandleFunc("/test", t.ServeHTTP).Methods(http.MethodGet)
 
-	b := &handler.MakeBoard{DB: db}
+	b := &handler.MakeBoard{DB: db, Validator: v}
 	r.HandleFunc("/makeBoard", b.ServeHTTP).Methods(http.MethodPost)
 
 	bl := &handler.BoardList{DB: db}

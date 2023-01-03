@@ -5,7 +5,7 @@ export default defineNuxtPlugin(() => {
       makeBoard: async (name:string,pass:string) :Promise<makeBoardRes | null> => {
         const router = useRouter();
         const config = useRuntimeConfig()
-        const { data, pending, refresh, error }  = await useFetch(`${config.apiServer}/makeBoard`, { method: 'POST', body: {Name : name,Password:pass} });
+        const { data, pending, refresh, error }  = await useFetch(`${config.apiServer}/makeBoard`, { method: 'POST', body: {name : name,Password:pass} });
         if(typeof error.value === "boolean"){
             return null
         }

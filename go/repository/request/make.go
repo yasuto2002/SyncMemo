@@ -1,6 +1,6 @@
 package request
 
 type Make struct {
-	Name     string `validate:"required"`
-	Password string `validate:"required"`
+	Name     string `json:"name" validate:"required"`
+	Password string `json:"passwowd"`
 }
