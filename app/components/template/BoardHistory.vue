@@ -2,7 +2,7 @@
     <div class="w-[47%] bg-white h-full p-[5%]">
         <h1 class="text-center  text-[20px] mb-[3vw]">作成済みボード</h1>
         <div class="flex items-center justify-around my-10" v-for="(board,i) in boards">
-            <p>算数の時間①</p>
+            <p>{{board.name}}①</p>
             <p>2020-7-15</p>
             <NuxtLink :to='{ path: "board",query: { id: board.id }}' class="text-[#0000FF] hover:cursor-pointer">開く</NuxtLink>
             <p class="text-[#FF0000] hover:cursor-pointer">削除</p>
