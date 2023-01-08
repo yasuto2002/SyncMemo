@@ -21,7 +21,8 @@
       />
     </div>
     <div class="mt-12">
-      <p class="text-[#ff0000] text-[12px]">{{ errors.email}}</p>
+      <p class="text-[#ff0000] text-[12px]" v-if="result===false">メールアドレスがすでに使われています</p>
+      <p class="text-[#ff0000] text-[12px]">{{ errors.mail}}</p>
       <p class="text-[#BCB8B8]">メールアドレス</p>
       <input
         type="mail"
@@ -61,7 +62,7 @@
     </div>
     <div class="mt-12">
       <p class="text-[#ff0000] text-[12px]">{{ errors.conPassword}}</p>
-      <p class="text-[#BCB8B8]">パスワード再設定</p>
+      <p class="text-[#BCB8B8]">パスワード確認</p>
       <input
         type="password"
         name=""
@@ -90,15 +91,17 @@
     </div>
   </form>
 </template>
-<script setup>
+<script lang="ts" setup>
 import { useField, useForm } from "vee-validate"
 import * as yup from "yup"
+import type { Ref } from 'vue'
 const router = useRouter();
 const config = useRuntimeConfig()
 const validateMes = useValidateMes()
+const { $casual } = useNuxtApp()
 const schema = yup.object({
   mail: yup.string().max(255,validateMes.value.max).required(validateMes.value.required).email(validateMes.value.mail).matches(validateMes.value.regex, validateMes.value.regexMes).trim(),
-  name: yup.string().max(10,validateMes.value.max).required(validateMes.value.required).matches(validateMes.value.regex, validateMes.value.regexMes),
+  name: yup.string().max(10,validateMes.value.max).min(2,validateMes.value.min).required(validateMes.value.required).matches(validateMes.value.regex, validateMes.value.regexMes),
   password:yup.string().min(10, validateMes.value.min).max(20, validateMes.value.max).matches(validateMes.value.regex, validateMes.value.regexMes).required(validateMes.value.required),
   conPassword:yup.string().min(10, validateMes.value.min).max(20, validateMes.value.max).matches(validateMes.value.regex, validateMes.value.regexMes).required(validateMes.value.required).oneOf([yup.ref("password")],validateMes.value.match),
 });
@@ -118,33 +121,18 @@ const { value: mail } = useField("mail")
 const { value: name } = useField("name")
 const { value: password } = useField("password");
 const { value: conPassword } = useField("conPassword");
+const errMes = ref()
+const result:Ref<boolean> = ref(null)
 const onSubmit = handleSubmit(async(values) => {
-  // const {data}= await useFetch(`${config.apiServer}/reg`,
-  // { method: 'POST', body: { 
-  //   name:values.name,
-  //   password:values.password,
-  //   mail:values.email,
-  // }}
-  // )
-  // if (!data.value) {
-  // clearError({ redirect: '/' })
-  // }
-  console.log(1)
-  const {data}= await useFetch(`${config.apiServer}/doubleCheck`,
-  { method: 'POST', body: { 
-    mail:values.mail,
-  }}
-  )
-  console.log(data)
-  if (!data.value) {
-    clearError({ redirect: '/' })
+  result.value = await $casual(values.name,values.mail,values.password)
+  if(result.value === true){
+    const mail = useCookie<{ address: string}>("mail",{maxAge: 3600})
+    mail.value = {address:values.mail}
+    router.push({ name: 'reg-token', params: { mail: values.mail } })
   }
-  if(data.value.status){
-    const regData = await useCookie('regData',60 * 60)
-    regData.value = values
-    router.push({ path: "/reg/token" });
-  }
-});
+  refresh()
+})
+const refresh = () => refreshNuxtData('result')
 </script>
 
 <style scoped>

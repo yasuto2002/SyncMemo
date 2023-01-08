@@ -32,6 +32,9 @@ services:
       TODO_DB_NAME: memo
       TODO_REDIS_HOST: memo-redis
       TODO_REDIS_PORT: 6379
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
     volumes:
       - ./go:/app
     ports:

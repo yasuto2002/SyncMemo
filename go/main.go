@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 
+	"syncmemo/auth"
+	"syncmemo/clock"
 	"syncmemo/config"
 	"syncmemo/handler"
 	"syncmemo/store"
@@ -45,9 +47,15 @@ func main() {
 		cancel()
 		client.Disconnect(ctx)
 	}()
+
+	authKvs := store.NewAuthKvs(ctx, cfg.Kvs)
+
 	r := mux.NewRouter()
 	r.Use(commonMiddleware)
 	v := validator.New()
+
+	clocker := clock.RealClocker{}
+	j, err := auth.NewJWTer(clocker)
 
 	chatroom := r.PathPrefix("/chatroom").Subrouter()
 	chatroom.HandleFunc("/create/{name}", CR(CreateChatroom)).Methods(http.MethodPost)
@@ -57,7 +65,7 @@ func main() {
 	cl := r.PathPrefix("/client").Subrouter()
 	cl.HandleFunc("/list", ListAllClients).Methods(http.MethodGet)
 
-	t := &handler.Test{DB: db, CTX: ctx, Validator: v}
+	t := &handler.Test{DB: db, CTX: ctx, Validator: v, JWT: j}
 	r.HandleFunc("/test", t.ServeHTTP).Methods(http.MethodGet)
 
 	b := &handler.MakeBoard{DB: db, Validator: v}
@@ -66,6 +74,11 @@ func main() {
 	bl := &handler.BoardList{DB: db}
 	r.HandleFunc("/boardList", bl.ServeHTTP).Methods(http.MethodPost)
 
+	casual := &handler.Casual{DB: db, Validator: v, Kvs: authKvs}
+	r.HandleFunc("/casual", casual.ServeHTTP).Methods(http.MethodPost)
+
+	reg := &handler.Register{DB: db, Validator: v, Kvs: authKvs}
+	r.HandleFunc("/register", reg.ServeHTTP).Methods(http.MethodPost)
 	log.Println("Registered Handlers")
 
 	log.Printf("Started Server on port : %v", port)
