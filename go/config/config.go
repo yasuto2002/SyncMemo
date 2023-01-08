@@ -10,6 +10,7 @@ import (
 type Config struct {
 	Port  string
 	Mongo string
+	Kvs   string
 }
 
 func New() (*Config, error) {
@@ -22,5 +23,6 @@ func New() (*Config, error) {
 	}
 	cfg.Port = os.Getenv("PORT")
 	cfg.Mongo = os.Getenv("MONGO")
+	cfg.Kvs = os.Getenv("REDIS")
 	return cfg, nil
 }
