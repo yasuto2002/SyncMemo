@@ -49,14 +49,14 @@ func main() {
 	}()
 
 	authKvs := store.NewAuthKvs(ctx, cfg.Kvs)
+	loginKvs := store.NewLoginKvs(ctx, cfg.Kvs)
 
 	r := mux.NewRouter()
 	r.Use(commonMiddleware)
 	v := validator.New()
 
 	clocker := clock.RealClocker{}
-	j, err := auth.NewJWTer(clocker)
-
+	jwter, err := auth.NewJWTer(clocker, loginKvs)
 	chatroom := r.PathPrefix("/chatroom").Subrouter()
 	chatroom.HandleFunc("/create/{name}", CR(CreateChatroom)).Methods(http.MethodPost)
 	chatroom.HandleFunc("/list", CR(ListChatroom)).Methods(http.MethodGet)
@@ -65,8 +65,10 @@ func main() {
 	cl := r.PathPrefix("/client").Subrouter()
 	cl.HandleFunc("/list", ListAllClients).Methods(http.MethodGet)
 
-	t := &handler.Test{DB: db, CTX: ctx, Validator: v, JWT: j}
-	r.HandleFunc("/test", t.ServeHTTP).Methods(http.MethodGet)
+	t := &handler.Test{DB: db, CTX: ctx, Validator: v, JWT: jwter}
+	test := r.PathPrefix("/test").Subrouter()
+	test.Use(handler.AuthMiddleware(jwter, loginKvs))
+	test.HandleFunc("/", t.ServeHTTP).Methods(http.MethodGet)
 
 	b := &handler.MakeBoard{DB: db, Validator: v}
 	r.HandleFunc("/makeBoard", b.ServeHTTP).Methods(http.MethodPost)
@@ -79,13 +81,19 @@ func main() {
 
 	reg := &handler.Register{DB: db, Validator: v, Kvs: authKvs}
 	r.HandleFunc("/register", reg.ServeHTTP).Methods(http.MethodPost)
-	log.Println("Registered Handlers")
+	if err != nil {
+		return
+	}
+	login := &handler.Login{DB: db, Validator: v, Kvs: loginKvs, JWTer: jwter}
+	r.HandleFunc("/login", login.ServeHTTP).Methods(http.MethodPost)
 
+	log.Println("Registered Handlers")
 	log.Printf("Started Server on port : %v", port)
 	headers := handlers.AllowedHeaders([]string{"*", "Content-Type", "*"})
+	authorization := handlers.AllowedHeaders([]string{"*", "Authorization", "*"})
 	origins := handlers.AllowedOrigins([]string{"*"})
 	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
-	http.ListenAndServe(":"+port, handlers.CORS(headers, origins, methodsOk)(r))
+	http.ListenAndServe(":"+port, handlers.CORS(headers, authorization, origins, methodsOk)(r))
 }
 
 func commonMiddleware(next http.Handler) http.Handler {

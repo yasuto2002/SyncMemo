@@ -53,9 +53,9 @@ func (c *Casual) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 				return
 			}
 			data := entity.User{
-				NAME:     regInfo.Mail,
-				MAIL:     regInfo.Mail,
-				PASSWORD: string(pas),
+				Name:     regInfo.Mail,
+				Mail:     regInfo.Mail,
+				Password: string(pas),
 			}
 			if err := store.TokenSet(ctx, c.Kvs, data, token); err != nil {
 				RespondJSON(ctx, rw, &ErrResponse{

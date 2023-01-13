@@ -39,3 +39,14 @@ func EmailCore(ctx context.Context, db *mongo.Database, mail string) error {
 	}
 	return nil
 }
+
+func GetUser(ctx context.Context, db *mongo.Database, mail string) (entity.User, error) {
+	usersCollection := db.Collection("provisional")
+	filter := &bson.M{"mail": mail}
+	var user entity.User
+	result := usersCollection.FindOne(ctx, filter)
+	if err := result.Decode(&user); err != nil {
+		return user, err
+	}
+	return user, nil
+}
