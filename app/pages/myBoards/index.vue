@@ -8,6 +8,4 @@
         </div>
         <TemplatePagination />
     </div>
-    
-    
 </template>

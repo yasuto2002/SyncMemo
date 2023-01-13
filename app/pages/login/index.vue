@@ -1,8 +1,9 @@
 <template>
-    <form class="w-[50%] m-auto text-[22px] pb-[9vh]">
+    <form class="w-[50%] m-auto text-[22px] pb-[9vh] bg-[#F9F9F9] h-[100vh]">
         <h1 class="text-center text-[32px] text-[#B9B9B9]">Login</h1>
         <div class="mt-12">
-        <p class="text-[#ff0000] text-[12px]">{{ errors.email}}</p>
+        <p class="text-[#ff0000] text-[12px]" v-if="errNumber === http.BadRequest">メールアドレスかパスワードが間違っています</p>
+        <p class="text-[#ff0000] text-[12px]">{{ errors.mail}}</p>
         <p class="text-[#BCB8B8]">メールアドレス</p>
         <input
             type="mail"
@@ -51,14 +52,19 @@
         </div>
     </form>
 </template>
-<script setup>
+<script lang="ts" setup>
 import { useField, useForm } from "vee-validate"
 import * as yup from "yup"
+import type {Login} from "../../repository/respons/login"
+import type { Ref } from 'vue'
+import type { errCode } from '../../repository/errCode'
 const router = useRouter();
 const config = useRuntimeConfig()
 const validateMes = useValidateMes()
 const authStore = useAuthStore()
 const {authLogin} = authStore
+const { $login } = useNuxtApp()
+const http = useHttp()
 const schema = yup.object({
     mail: yup.string().max(255,validateMes.value.max).required(validateMes.value.required).email(validateMes.value.mail).matches(validateMes.value.regex, validateMes.value.regexMes).trim(),
     password:yup.string().min(10, validateMes.value.min).max(20, validateMes.value.max).matches(validateMes.value.regex, validateMes.value.regexMes).required(validateMes.value.required),
@@ -73,25 +79,22 @@ const { errors, meta, handleSubmit } = useForm({
     password:"",
     },
 });
+let login:Login = null
+let errNumber:Ref<errCode> = ref(http.value.Success)
+
+
 const { value: mail } = useField("mail")
 const { value: password } = useField("password");
+
 const onSubmit = handleSubmit(async(values) => {
-    console.log(1)
-    const {data}= await useFetch(`${config.apiServer}/login`,
-    { method: 'POST', body: { 
-        mail:values.mail,
-        password:values.password,
-    }}
-)
-    console.log(data)
-    if (!data.value) {
-    clearError({ redirect: '/' })
-    }else{
-        await authLogin()
-        const logToken =  useCookie('logToken',60 * 60)
-        logToken.value = data.value.token
-        router.push({ path: "/" });
+    [login,errNumber.value] = await $login(values.mail,values.password)
+    if (login == null){
+        return
     }
+    console.log("成功");
+    
+    const token = useCookie<{ token: string}>("token",{maxAge: 3600})
+    token.value = {token:login.token}
 });
 </script>
 

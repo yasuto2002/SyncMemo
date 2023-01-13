@@ -22,7 +22,7 @@ func TokenSet(ctx context.Context, rdb *redis.Client, user entity.User, token st
 		User:  user,
 		Token: token,
 	}
-	err := rdb.Set(ctx, user.MAIL, data, 30*time.Minute).Err()
+	err := rdb.Set(ctx, user.Mail, data, 30*time.Minute).Err()
 	if err != nil {
 		return err
 	}
