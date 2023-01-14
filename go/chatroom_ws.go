@@ -161,6 +161,8 @@ func chatroomExists(id ChatroomID) bool {
 
 }
 
+// Connタイプは、WebSocket接続を表す。サーバーアプリケーションは、HTTPリクエストハンドラから
+// HTTPリクエストハンドラからUpgrader.Upgradeメソッドを呼び出し、 *Conn.Connを取得します。
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  readBuffSize,
 	WriteBufferSize: writeBuffSize,
