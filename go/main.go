@@ -58,8 +58,8 @@ func main() {
 	clocker := clock.RealClocker{}
 	jwter, err := auth.NewJWTer(clocker, loginKvs)
 	chatroom := r.PathPrefix("/chatroom").Subrouter()
-	chatroom.HandleFunc("/create/{name}", CR(CreateChatroom)).Methods(http.MethodPost)
-	chatroom.HandleFunc("/list", CR(ListChatroom)).Methods(http.MethodGet)
+	chatroom.HandleFunc("/create/{name}", CR(CreateChatroom, ctx, db)).Methods(http.MethodPost)
+	chatroom.HandleFunc("/list", CR(ListChatroom, ctx, db)).Methods(http.MethodGet)
 	chatroom.HandleFunc("/connect", clientMW(chatroomWSHandler))
 
 	cl := r.PathPrefix("/client").Subrouter()

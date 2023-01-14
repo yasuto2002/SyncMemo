@@ -1,18 +1,22 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
 	"sync"
+	"syncmemo/model"
+	"syncmemo/repository/request"
 
 	"github.com/gorilla/websocket"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var rooms = Rooms{Data: map[ChatroomID]*Chatroom{}, RWMutex: new(sync.RWMutex), Wg: new(sync.WaitGroup)}
 
 type Broadcast struct {
-	Message     []byte   //The actual message
+	Message     []byte   //実際のメッセージ
 	MessageType int      //as defined by the gorilla websocket package.
 	Cid         ClientID //the UUID of the client.
 	Cname       string   //name of the client
@@ -54,7 +58,7 @@ func (cd ChatData) String() string {
 }
 
 // create creates a chatroom and allocates memory.
-func (r *Rooms) create(name string) ChatroomID {
+func (r *Rooms) create(name string, ctx context.Context, db *mongo.Database) ChatroomID {
 
 	// crID := ChatroomID(uuid.New().String())
 	crID := ChatroomID(name)
@@ -71,7 +75,7 @@ func (r *Rooms) create(name string) ChatroomID {
 	r.Data[crID] = cr
 
 	rooms.Wg.Add(1)
-	go cr.broadcaster(rooms.Wg)
+	go cr.broadcaster(rooms.Wg, ctx, db)
 	log.Printf("Chatroom Created - URL : ws://localhost:%v/chatroom/connect", port)
 	return crID
 }
@@ -128,21 +132,44 @@ func (c *Chatroom) pushToBroadcast(msg []byte, mt int, cid ClientID, cname strin
 }
 
 // broadcaster will get the data which needs to be broadcasted and broadcast it.
-func (c *Chatroom) broadcaster(wg *sync.WaitGroup) {
+func (c *Chatroom) broadcaster(wg *sync.WaitGroup, ctx context.Context, db *mongo.Database) {
 
 	defer wg.Done()
 
 	for b := range c.BroadcastChannel {
-
+		var memo request.Memo
+		if err := json.Unmarshal(b.Message, &memo); err != nil {
+			log.Printf("Error Unmarshal json : %v", err)
+		}
+		if memo.ActionId == 2 {
+			id, err := model.MakeMemos(ctx, db, memo)
+			if err != nil {
+				log.Printf("Error Insert Memo : %v", err)
+			}
+			memo.Id = id
+		}
+		addData, err := json.Marshal(memo)
+		if err != nil {
+			log.Printf("Error Marshal json: %v", err)
+		}
 		for id, cl := range c.Clients {
 			if id == b.Cid { //If its the sender then skip
+				chat := ChatData{ //Create chat data and write to connections
+					Name: b.Cname,
+					ID:   b.Cid,
+					Data: string(addData),
+					Type: "text",
+				}
+				if err := cl.Conn.WriteJSON(chat); err != nil {
+					log.Printf("Error occured while sending message : %v", err)
+					continue
+				}
 				continue
 			}
-
 			chat := ChatData{ //Create chat data and write to connections
 				Name: b.Cname,
 				ID:   b.Cid,
-				Data: string(b.Message),
+				Data: string(addData),
 				Type: "text",
 			}
 

@@ -17,12 +17,16 @@
   </div>
 </template>
 <script setup lang="ts">
+import { ActionCede } from "../../repository/actionCode"
 const memo = ref(null);
 let view = ref(true);
 let text = ref()
 const emit = defineEmits<{
   (event: "moveMemo", firstName: object): void;
 }>()
+const props = defineProps({
+  data: { type: Object, required: true },
+});
 const out = () => {
   view.value = !view.value;
   let memoData = {
@@ -30,26 +34,24 @@ const out = () => {
       text: text.value,
       x:y.value,
       y:x.value,
+      actionId:ActionCede.MOVE
   };
   emit("moveMemo",memoData)
 };
 const input = () =>{
-  console.log("kye")
   let memoData = {
-      id: props.data.memo._id,
+      id: props.data.memo.id,
       text: text.value,
       x:y.value,
       y:x.value,
+      actionId:ActionCede.MOVE
   };
   emit("moveMemo",memoData)
 }
-const props = defineProps({
-  data: { type: Object, required: true },
-});
+
 text.value = props.data.memo.text
 let x = ref(0)
 let y = ref(0)
-// const emit = defineEmits();
 onMounted(() => {
   var kx;
   var ky;
@@ -68,8 +70,6 @@ onMounted(() => {
 
   //マウスが押された際の関数
   function mdown(e) {
-    //クラス名に .drag を追加
-    // obj.classList.add("drag");
 
     //タッチデイベントとマウスのイベントの差異を吸収
     if (e.type === "mousedown") {
@@ -105,10 +105,11 @@ onMounted(() => {
     memo.value.style.top = y.value + "px";
     memo.value.style.left =x.value + "px";
     let memoData = {
-      id: props.data.memo._id,
+      id: props.data.memo.id,
       text: props.data.memo.text,
       x:y.value,
       y:x.value,
+      actionId:ActionCede.MOVE
     };
     emit("moveMemo",memoData)
     //マウスボタンが離されたとき、またはカーソルが外れたとき発火
