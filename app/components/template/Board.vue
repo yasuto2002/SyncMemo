@@ -18,7 +18,7 @@
   </div>
 </template>
 <script setup lang="ts">
-
+import { ActionCede } from "../../repository/actionCode"
 const route = useRoute()
 const id = route.query.id;
 const router = useRouter();
@@ -35,52 +35,47 @@ ws.onopen = function () {
 ws.onmessage = function (event) {
   let info = JSON.parse(event.data)
   info = JSON.parse(info.data)
-  memos.value[0].x = info.x
-  memos.value[0].y = info.y
-  memos.value[0].text = info.text
+  if(info.actionId == ActionCede.ADD){
+    let data = {
+      id: info.id,
+      text: info.text,
+      x:info.x,
+      y:info.y,
+      boardId : id
+    }
+    memos.value.push(data)
+    return
+  }else{
+    for(let i = 0; i < memos.value.length;i++){
+      if(memos.value[i].id == info.id){
+        memos.value[i].x = info.x
+        memos.value[i].y = info.y
+        memos.value[i].text = info.text
+      }
+    }
+  }
 }
 const nuxtApp = useNuxtApp();
-// let { socket, makeMemo, sendMemo } = await nuxtApp.$makeSoket();
 let apiData = await nuxtApp.$reqApi();
-// console.log(apiData);
-// const getMemos = async() =>{
-//   let {data}= await useFetch(`${config.apiServer}/getMemo`
-//   )
-//   if (!data.value) {
-//     clearError({ redirect: '/' })
-//   }else{
-//     console.log(data.value.memos)
-//     memos.value = data.value.memos
-//   }
-// }
-// getMemos()
 const coll = () => {
-  // socket.emit("makeMemo");
-  // console.log(1)
-  memos.value.push({
-      id: 0,
+  let data = {
+      id: "",
       text: "",
       x:0,
       y:0,
-  })
-  console.log(memos.value)
+      actionId: 2,
+      boardId : id
+  }
+  ws.send(JSON.stringify(data))
 };
-// socket.on("preservation", (data) => {
-//   id = data;
-// });
-// socket.on("addMemo", (data) => {
-//   memos.value = data.memos;
-//   console.log(memos.value[0]._id)
-// });
-// socket.on("receiveData", (receiveData) => {
-//   console.log(receiveData)
-//   memos.value = receiveData.memos;
-//   refresh()
-// });
 const moveMemo = (data) => {
-  memos.value[0].x = data.x
-  memos.value[0].y = data.y
-  memos.value[0].text = data.text
+  for(let i = 0; i < memos.value.length;i++){
+      if(memos.value[i].id == data.id){
+        memos.value[i].x = data.x
+        memos.value[i].y = data.y
+        memos.value[i].text = data.text
+      }
+    }
   ws.send(JSON.stringify(data))
 };
 
