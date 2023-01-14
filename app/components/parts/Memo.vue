@@ -4,35 +4,40 @@
     id="red-box"
     ref="memo"
   >
-    <p v-if="view" class="w-full h-full p-[5%]">{{ data.text }}</p>
+    <p v-if="view" class="w-full h-full p-[5%]">{{ text }}</p>
     <textarea
       name=""
       id=""
-      v-model="data.text"
+      v-model="text"
       v-if="!view"
       class="resize-none focus:outline-none w-full h-full p-[5%]"
       @blur="out"
-      @keydown="input"
+      @keyup="input"
     ></textarea>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 const memo = ref(null);
 let view = ref(true);
+let text = ref()
+const emit = defineEmits<{
+  (event: "moveMemo", firstName: object): void;
+}>()
 const out = () => {
   view.value = !view.value;
   let memoData = {
       id: props.data.memo.id,
-      text: props.data.memo.text,
-      x:x.value,
-      y:y.value,
+      text: text.value,
+      x:y.value,
+      y:x.value,
   };
   emit("moveMemo",memoData)
 };
 const input = () =>{
+  console.log("kye")
   let memoData = {
       id: props.data.memo._id,
-      text: props.data.memo.text,
+      text: text.value,
       x:y.value,
       y:x.value,
   };
@@ -41,9 +46,10 @@ const input = () =>{
 const props = defineProps({
   data: { type: Object, required: true },
 });
+text.value = props.data.memo.text
 let x = ref(0)
 let y = ref(0)
-const emit = defineEmits();
+// const emit = defineEmits();
 onMounted(() => {
   var kx;
   var ky;
@@ -53,6 +59,7 @@ onMounted(() => {
   watchEffect(() => {
     memo.value.style.top = props.data.memo.x + 'px'
     memo.value.style.left = props.data.memo.y + 'px'
+    text.value = props.data.memo.text
   })
   //マウスが要素内で押されたとき、又はタッチされたとき発火
   memo.value.addEventListener("mousedown", mdown)

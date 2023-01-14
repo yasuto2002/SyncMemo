@@ -17,7 +17,7 @@
     />
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 
 const route = useRoute()
 const id = route.query.id;
@@ -26,7 +26,7 @@ const memoel = ref([]);
 let memos = ref([])
 const config = useRuntimeConfig()
 const { $createRoom } = useNuxtApp()
-$createRoom(id)
+$createRoom(id as string)
 
 const ws = new WebSocket(config.socket + `/chatroom/connect?name=${id}&chatroom_id=${id}`)
 ws.onopen = function () {
@@ -37,6 +37,7 @@ ws.onmessage = function (event) {
   info = JSON.parse(info.data)
   memos.value[0].x = info.x
   memos.value[0].y = info.y
+  memos.value[0].text = info.text
 }
 const nuxtApp = useNuxtApp();
 // let { socket, makeMemo, sendMemo } = await nuxtApp.$makeSoket();
@@ -59,8 +60,8 @@ const coll = () => {
   memos.value.push({
       id: 0,
       text: "",
-      x:10,
-      y:10,
+      x:0,
+      y:0,
   })
   console.log(memos.value)
 };
@@ -79,8 +80,8 @@ const coll = () => {
 const moveMemo = (data) => {
   memos.value[0].x = data.x
   memos.value[0].y = data.y
+  memos.value[0].text = data.text
   ws.send(JSON.stringify(data))
-  console.log(memos.value)
 };
 
 onMounted( async() => {
