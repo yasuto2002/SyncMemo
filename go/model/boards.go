@@ -24,7 +24,6 @@ func MakeBords(ctx context.Context, db *mongo.Database, item request.Make) (resp
 	if err != nil {
 		return response.Make{ID: ""}, fmt.Errorf("MakeBords")
 	}
-	fmt.Println(insertResult.InsertedID)
 	return response.Make{ID: insertResult.InsertedID.(primitive.ObjectID).Hex()}, nil
 }
 

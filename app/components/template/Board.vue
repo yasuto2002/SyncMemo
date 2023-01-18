@@ -5,8 +5,8 @@
   >
     <PartsMemo
       class="drag-and-drop bg-[#fffdfd] text-[#7c4e4e] rounded-[10px] el absolute"
-      v-for="memo in memos"
-      :key="memo"
+      v-for="(memo,i) in memos"
+      :key="i"
       :data="{ memo }"
       :ref="
         (el) => {
@@ -19,15 +19,26 @@
 </template>
 <script setup lang="ts">
 import { ActionCede } from "../../repository/actionCode"
+import type { errCode } from '../../repository/errCode'
+import type { Ref } from 'vue'
+import type { Memo } from '../../repository/respons/memo'
 const route = useRoute()
 const id = route.query.id;
 const router = useRouter();
 const memoel = ref([]);
-let memos = ref([])
+let memos:Ref<Array<Memo>> = ref(new Array)
+const stetusCode:Ref<errCode> =  ref(200)
 const config = useRuntimeConfig()
 const { $createRoom } = useNuxtApp()
+const { $memos } = useNuxtApp()
 $createRoom(id as string)
-
+let evacuation:Array<Memo>
+[evacuation,stetusCode.value] = await $memos(id as string)
+if(stetusCode.value == 200 && evacuation != null){
+  memos.value = evacuation
+}else{
+  router.push("/error")
+}
 const ws = new WebSocket(config.socket + `/chatroom/connect?name=${id}&chatroom_id=${id}`)
 ws.onopen = function () {
     console.log("接続が開かれたときに呼び出されるイベント")
@@ -36,12 +47,12 @@ ws.onmessage = function (event) {
   let info = JSON.parse(event.data)
   info = JSON.parse(info.data)
   if(info.actionId == ActionCede.ADD){
-    let data = {
+    let data:Memo = {
       id: info.id,
       text: info.text,
       x:info.x,
       y:info.y,
-      boardId : id
+      boardid : id as string
     }
     memos.value.push(data)
     return
@@ -55,8 +66,6 @@ ws.onmessage = function (event) {
     }
   }
 }
-const nuxtApp = useNuxtApp();
-let apiData = await nuxtApp.$reqApi();
 const coll = () => {
   let data = {
       id: "",

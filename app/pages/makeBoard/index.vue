@@ -4,7 +4,7 @@
     <div class="flex items-center justify-between w-[90%] m-auto pb-11 h-[40vw]">
       <TemplateCreatedFormats>
         <template v-slot:formatName>ボードを作る</template>
-      </TemplateCreatedFormats>>
+      </TemplateCreatedFormats>
       <TemplateBoardHistory />
     </div>
   </div>
