@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"syncmemo/repository/request"
 	"time"
 
 	"github.com/goombaio/namegenerator"
@@ -18,13 +19,13 @@ type CRResponse struct {
 	Message string     `json:"message,omitempty"`
 }
 
-type CRMiddleware func(CRMiddlewareData, http.ResponseWriter, context.Context, *mongo.Database)
+type CRMiddleware func(CRMiddlewareData, http.ResponseWriter, context.Context, *mongo.Database, chan request.Memo)
 
 type CRMiddlewareData struct {
 	vars map[string]string
 }
 
-func CR(next CRMiddleware, ctx context.Context, db *mongo.Database) http.HandlerFunc {
+func CR(next CRMiddleware, ctx context.Context, db *mongo.Database, ch chan request.Memo) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 
 		vars := mux.Vars(r)
@@ -32,11 +33,11 @@ func CR(next CRMiddleware, ctx context.Context, db *mongo.Database) http.Handler
 		crmd := CRMiddlewareData{}
 		crmd.vars = vars
 
-		next(crmd, rw, ctx, db)
+		next(crmd, rw, ctx, db, ch)
 	}
 }
 
-func CreateChatroom(crmd CRMiddlewareData, rw http.ResponseWriter, ctx context.Context, db *mongo.Database) {
+func CreateChatroom(crmd CRMiddlewareData, rw http.ResponseWriter, ctx context.Context, db *mongo.Database, ch chan request.Memo) {
 
 	crName := crmd.vars["name"]
 	if crName == "" {
@@ -50,7 +51,7 @@ func CreateChatroom(crmd CRMiddlewareData, rw http.ResponseWriter, ctx context.C
 		return
 	}
 
-	crid := rooms.create(crName, ctx, db)
+	crid := rooms.create(crName, ctx, db, ch)
 
 	log.Printf("Created Chatroom : %v", crName)
 
@@ -71,7 +72,7 @@ func CreateChatroom(crmd CRMiddlewareData, rw http.ResponseWriter, ctx context.C
 	rw.Write(out)
 }
 
-func ListChatroom(crmd CRMiddlewareData, rw http.ResponseWriter, ctx context.Context, db *mongo.Database) {
+func ListChatroom(crmd CRMiddlewareData, rw http.ResponseWriter, ctx context.Context, db *mongo.Database, ch chan request.Memo) {
 
 	output := []map[string]string{}
 

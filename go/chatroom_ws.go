@@ -58,7 +58,7 @@ func (cd ChatData) String() string {
 }
 
 // create creates a chatroom and allocates memory.
-func (r *Rooms) create(name string, ctx context.Context, db *mongo.Database) ChatroomID {
+func (r *Rooms) create(name string, ctx context.Context, db *mongo.Database, ch chan request.Memo) ChatroomID {
 
 	// crID := ChatroomID(uuid.New().String())
 	crID := ChatroomID(name)
@@ -75,7 +75,7 @@ func (r *Rooms) create(name string, ctx context.Context, db *mongo.Database) Cha
 	r.Data[crID] = cr
 
 	rooms.Wg.Add(1)
-	go cr.broadcaster(rooms.Wg, ctx, db)
+	go cr.broadcaster(rooms.Wg, ctx, db, ch)
 	log.Printf("Chatroom Created - URL : ws://localhost:%v/chatroom/connect", port)
 	return crID
 }
@@ -132,7 +132,7 @@ func (c *Chatroom) pushToBroadcast(msg []byte, mt int, cid ClientID, cname strin
 }
 
 // broadcaster will get the data which needs to be broadcasted and broadcast it.
-func (c *Chatroom) broadcaster(wg *sync.WaitGroup, ctx context.Context, db *mongo.Database) {
+func (c *Chatroom) broadcaster(wg *sync.WaitGroup, ctx context.Context, db *mongo.Database, ch chan request.Memo) {
 
 	defer wg.Done()
 
@@ -151,6 +151,8 @@ func (c *Chatroom) broadcaster(wg *sync.WaitGroup, ctx context.Context, db *mong
 		addData, err := json.Marshal(memo)
 		if err != nil {
 			log.Printf("Error Marshal json: %v", err)
+		} else if err == nil && memo.ActionId == 1 {
+			ch <- memo
 		}
 		for id, cl := range c.Clients {
 			if id == b.Cid { //If its the sender then skip

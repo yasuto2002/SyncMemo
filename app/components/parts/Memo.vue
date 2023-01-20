@@ -26,6 +26,7 @@ const emit = defineEmits<{
 }>()
 const props = defineProps({
   data: { type: Object, required: true },
+  boardId:{ type: String, required: true},
 });
 const out = () => {
   view.value = !view.value;
@@ -34,7 +35,8 @@ const out = () => {
       text: text.value,
       x:y.value,
       y:x.value,
-      actionId:ActionCede.MOVE
+      actionId:ActionCede.MOVE,
+      boardId:props.boardId
   };
   emit("moveMemo",memoData)
 };
@@ -44,7 +46,8 @@ const input = () =>{
       text: text.value,
       x:y.value,
       y:x.value,
-      actionId:ActionCede.MOVE
+      actionId:ActionCede.MOVE,
+      boardId:props.boardId
   };
   emit("moveMemo",memoData)
 }
@@ -53,8 +56,8 @@ text.value = props.data.memo.text
 let x = ref(0)
 let y = ref(0)
 onMounted(() => {
-  var kx;
-  var ky;
+  var kx
+  var ky
   memo.value.style.top = props.data.memo.x + 'px'
   memo.value.style.left = props.data.memo.y + 'px'
   var el = memo;
@@ -109,7 +112,8 @@ onMounted(() => {
       text: props.data.memo.text,
       x:y.value,
       y:x.value,
-      actionId:ActionCede.MOVE
+      actionId:ActionCede.MOVE,
+      boardId:props.boardId
     };
     emit("moveMemo",memoData)
     //マウスボタンが離されたとき、またはカーソルが外れたとき発火
