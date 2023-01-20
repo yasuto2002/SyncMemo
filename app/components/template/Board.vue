@@ -8,6 +8,7 @@
       v-for="(memo,i) in memos"
       :key="i"
       :data="{ memo }"
+      :boardId="boardId"
       :ref="
         (el) => {
           if (el) memoel[0] = el;
@@ -24,6 +25,7 @@ import type { Ref } from 'vue'
 import type { Memo } from '../../repository/respons/memo'
 const route = useRoute()
 const id = route.query.id;
+const boardId:Ref<string> = ref(route.query.id as string)
 const router = useRouter();
 const memoel = ref([]);
 let memos:Ref<Array<Memo>> = ref(new Array)
@@ -31,11 +33,13 @@ const stetusCode:Ref<errCode> =  ref(200)
 const config = useRuntimeConfig()
 const { $createRoom } = useNuxtApp()
 const { $memos } = useNuxtApp()
-$createRoom(id as string)
+$createRoom(boardId.value as string)
 let evacuation:Array<Memo>
 [evacuation,stetusCode.value] = await $memos(id as string)
 if(stetusCode.value == 200 && evacuation != null){
   memos.value = evacuation
+}else if(evacuation == null){
+  memos.value = new Array
 }else{
   router.push("/error")
 }
@@ -52,7 +56,7 @@ ws.onmessage = function (event) {
       text: info.text,
       x:info.x,
       y:info.y,
-      boardid : id as string
+      boardid : boardId.value as string
     }
     memos.value.push(data)
     return
@@ -73,7 +77,7 @@ const coll = () => {
       x:0,
       y:0,
       actionId: 2,
-      boardId : id
+      boardId : boardId.value
   }
   ws.send(JSON.stringify(data))
 };

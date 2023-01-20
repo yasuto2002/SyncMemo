@@ -12,6 +12,8 @@ import (
 	"syncmemo/clock"
 	"syncmemo/config"
 	"syncmemo/handler"
+	"syncmemo/model"
+	"syncmemo/repository/request"
 	"syncmemo/store"
 
 	"github.com/go-playground/validator/v10"
@@ -55,11 +57,17 @@ func main() {
 	r.Use(commonMiddleware)
 	v := validator.New()
 
+	ch := make(chan request.Memo)
+
+	for i := 0; i < 2; i++ {
+		go model.AddCh(ctx, db, ch)
+	}
+
 	clocker := clock.RealClocker{}
 	jwter, err := auth.NewJWTer(clocker, loginKvs)
 	chatroom := r.PathPrefix("/chatroom").Subrouter()
-	chatroom.HandleFunc("/create/{name}", CR(CreateChatroom, ctx, db)).Methods(http.MethodPost)
-	chatroom.HandleFunc("/list", CR(ListChatroom, ctx, db)).Methods(http.MethodGet)
+	chatroom.HandleFunc("/create/{name}", CR(CreateChatroom, ctx, db, ch)).Methods(http.MethodPost)
+	chatroom.HandleFunc("/list", CR(ListChatroom, ctx, db, ch)).Methods(http.MethodGet)
 	chatroom.HandleFunc("/connect", clientMW(chatroomWSHandler))
 
 	cl := r.PathPrefix("/client").Subrouter()
