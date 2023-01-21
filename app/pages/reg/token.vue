@@ -43,6 +43,7 @@
     const config = useRuntimeConfig()
     const authStore = useAuthStore()
     const {authLogin} = authStore
+    const {authState} = authStore
     const { $reg } = useNuxtApp()
     const router = useRouter()
     const schema = yup.object({
@@ -73,7 +74,8 @@
         result.value = await $reg(mail,values.token)
         if(result.value){
             router.push("/")
-            console.log("成功")
+            authLogin() 
+            console.log(authState.value)
         }else if(result.value === null){
             router.push("/error")
         }

@@ -8,7 +8,7 @@
     <textarea
       name=""
       id=""
-      v-model="text"
+      v-model="(text)"
       v-if="!view"
       class="resize-none focus:outline-none w-full h-full p-[5%]"
       @blur="out"
@@ -17,10 +17,13 @@
   </div>
 </template>
 <script setup lang="ts">
+
 import { ActionCede } from "../../repository/actionCode"
-const memo = ref(null);
-let view = ref(true);
-let text = ref()
+import type { SendMemo } from '../../repository/request/sendMemo'
+import type { Ref } from 'vue'
+const memo:Ref<HTMLElement> = ref(null) // refの値をとる
+let view:Ref<boolean> = ref(true);
+let text:Ref<string> = ref()
 const emit = defineEmits<{
   (event: "moveMemo", firstName: object): void;
 }>()
@@ -28,9 +31,12 @@ const props = defineProps({
   data: { type: Object, required: true },
   boardId:{ type: String, required: true},
 });
+
+text.value = props.data.memo.text
+
 const out = () => {
   view.value = !view.value;
-  let memoData = {
+  let memoData:SendMemo = {
       id: props.data.memo.id,
       text: text.value,
       x:y.value,
@@ -41,7 +47,7 @@ const out = () => {
   emit("moveMemo",memoData)
 };
 const input = () =>{
-  let memoData = {
+  let memoData:SendMemo = {
       id: props.data.memo.id,
       text: text.value,
       x:y.value,
@@ -52,15 +58,15 @@ const input = () =>{
   emit("moveMemo",memoData)
 }
 
-text.value = props.data.memo.text
 let x = ref(0)
 let y = ref(0)
+
 onMounted(() => {
-  var kx
-  var ky
+  let kx:number
+  let ky:number
   memo.value.style.top = props.data.memo.x + 'px'
   memo.value.style.left = props.data.memo.y + 'px'
-  var el = memo;
+  var el:HTMLElement = memo.value;
   watchEffect(() => {
     memo.value.style.top = props.data.memo.x + 'px'
     memo.value.style.left = props.data.memo.y + 'px'
@@ -92,7 +98,7 @@ onMounted(() => {
   //マウスカーソルが動いたときに発火
   async function mmove(e) {
     //ドラッグしている要素を取得
-    var drag = await document.getElementsByClassName("drag")[0];
+    var drag:Element = await document.getElementsByClassName("drag")[0];
     //同様にマウスとタッチの差異を吸収
     if (e.type === "mousemove") {
       var event = e;
@@ -107,15 +113,9 @@ onMounted(() => {
     x.value = event.pageX - kx
     memo.value.style.top = y.value + "px";
     memo.value.style.left =x.value + "px";
-    let memoData = {
-      id: props.data.memo.id,
-      text: props.data.memo.text,
-      x:y.value,
-      y:x.value,
-      actionId:ActionCede.MOVE,
-      boardId:props.boardId
-    };
-    emit("moveMemo",memoData)
+
+    input() //値を送信
+
     //マウスボタンが離されたとき、またはカーソルが外れたとき発火
     memo.value.addEventListener("mouseup", mup, false);
     document.body.addEventListener("mouseleave", mup, false);
@@ -133,6 +133,7 @@ onMounted(() => {
       //クラス名 .drag も消す
       memo.value.classList.remove("drag");
   }
+
   function action(e) {
     view.value = !view.value;
   }
