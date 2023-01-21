@@ -92,9 +92,10 @@ const onSubmit = handleSubmit(async(values) => {
         return
     }
     console.log("成功");
-    
+    authLogin() 
     const token = useCookie<{ token: string}>("token",{maxAge: 3600})
     token.value = {token:login.token}
+    router.push("/")
 });
 </script>
 

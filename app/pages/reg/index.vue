@@ -99,6 +99,11 @@ const router = useRouter();
 const config = useRuntimeConfig()
 const validateMes = useValidateMes()
 const { $casual } = useNuxtApp()
+const route = useRoute()
+const authStore = useAuthStore()
+const {authState} = authStore
+const {authLogin} = authStore
+
 const schema = yup.object({
   mail: yup.string().max(255,validateMes.value.max).required(validateMes.value.required).email(validateMes.value.mail).matches(validateMes.value.regex, validateMes.value.regexMes).trim(),
   name: yup.string().max(10,validateMes.value.max).min(2,validateMes.value.min).required(validateMes.value.required).matches(validateMes.value.regex, validateMes.value.regexMes),
@@ -123,6 +128,10 @@ const { value: password } = useField("password");
 const { value: conPassword } = useField("conPassword");
 const errMes = ref()
 const result:Ref<boolean> = ref(null)
+const mailCheck:string = route.params.mail as string
+if(typeof mailCheck == "undefined"){
+    router.push("/")
+}
 const onSubmit = handleSubmit(async(values) => {
   result.value = await $casual(values.name,values.mail,values.password)
   if(result.value === true){

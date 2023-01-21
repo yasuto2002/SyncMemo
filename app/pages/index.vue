@@ -22,7 +22,7 @@
         <span>0</span>ユーザー
       </p>
     </div>
-    <button
+    <NuxtLink
       class="
         mb-[6vw]
         bg-[#E9E5E5]
@@ -32,36 +32,20 @@
         rounded-[10px]
         hover:opacity-80
       "
+      to="/makeBoard"
     >
       start
-    </button>
+    </NuxtLink>
   </div>
 </template>
 <script setup>
 import { io } from "socket.io-client";
 const config = useRuntimeConfig();
-const socket = io(config.apiServer);
 const authStore = useAuthStore()
 const {authState} = authStore
 const {authLogin} = authStore
-// socket.emit("hello", "world");
-// socket.on("news", (data) => {
-//   console.log(data);
-// });
-// const { data } = await useFetch(`${config.apiContainer}/api`);
-// let aData = data.value[0].name;
-// console.log(aData);
+
 const regData = useCookie('regData')
 const logToken = useCookie('logToken')
-    console.log(authState.value)
-    // console.log(logToken.value)
-    //     if(logToken.value){
-    //     let {data}= await useFetch(`${config.apiContainer}/login`,
-    //     { method: 'POST', body: { 
-    //         token:logToken
-    //     }}
-    //     )
-    //     console.log(data)
-    //     }
-    const loginStatus = computed(() => authState.value)
+const loginStatus = computed(() => authState.value)
 </script>

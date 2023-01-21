@@ -18,8 +18,9 @@
             "
             v-model="boardName"
             /><br />
-            <input type="checkbox" id="validity" v-model="checked"/>
-            <label for="validity">パスワードを有効にする</label>
+            <input type="checkbox" id="validity" v-model="checked" :disabled="!loginStatus"/>
+            <label for="validity" :class="{'opacity-60':!loginStatus}">パスワードを有効にする</label>
+            <p class="text-[#ff0000]" v-if="!loginStatus">ログインユーザーのみパスワードを有効にできます</p>
             <p class="mt-[3vw]" v-bind:class= "{'text-[#F3F5F4]' : !checked}">パスワード</p>
             <input
             type="password"
@@ -66,10 +67,12 @@ import type {makeBoardRes} from '../../repository/respons/makeBoard';
 import type { Ref } from 'vue';
 const boardName:Ref<string> = ref("")
 const boardPassword:Ref<string> = ref("")
-const router = useRouter();
+const router = useRouter()
+const authStore = useAuthStore()
 const checked = useState('ref1-key', () => false)
 const { $makeBoard } = useNuxtApp()
-
+const { authState } = authStore
+const loginStatus = ref(computed(() => authState.value))
 const make = async() =>{
     const { $makeBoard } = useNuxtApp()
     const id:makeBoardRes = await $makeBoard(boardName.value,boardPassword.value)
@@ -79,4 +82,5 @@ const make = async() =>{
     }
     router.push({ path: 'board',query: { id: id.id }})
 }
+
 </script>

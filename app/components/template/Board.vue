@@ -23,19 +23,23 @@ import { ActionCede } from "../../repository/actionCode"
 import type { errCode } from '../../repository/errCode'
 import type { Ref } from 'vue'
 import type { Memo } from '../../repository/respons/memo'
+import type { SendMemo } from '../../repository/request/sendMemo'
+
 const route = useRoute()
-const id = route.query.id;
-const boardId:Ref<string> = ref(route.query.id as string)
-const router = useRouter();
-const memoel = ref([]);
-let memos:Ref<Array<Memo>> = ref(new Array)
-const stetusCode:Ref<errCode> =  ref(200)
+const router = useRouter()
 const config = useRuntimeConfig()
 const { $createRoom } = useNuxtApp()
 const { $memos } = useNuxtApp()
+
+const boardId:Ref<string> = ref(route.query.id as string)
+const memoel = ref([])
+let memos:Ref<Array<Memo>> = ref(new Array)
+const stetusCode:Ref<errCode> =  ref(200)
+
 $createRoom(boardId.value as string)
+
 let evacuation:Array<Memo>
-[evacuation,stetusCode.value] = await $memos(id as string)
+[evacuation,stetusCode.value] = await $memos(boardId.value as string)
 if(stetusCode.value == 200 && evacuation != null){
   memos.value = evacuation
 }else if(evacuation == null){
@@ -43,11 +47,13 @@ if(stetusCode.value == 200 && evacuation != null){
 }else{
   router.push("/error")
 }
-const ws = new WebSocket(config.socket + `/chatroom/connect?name=${id}&chatroom_id=${id}`)
+
+const ws = new WebSocket(config.socket + `/chatroom/connect?name=${boardId.value}&chatroom_id=${boardId.value}`)
+
 ws.onopen = function () {
     console.log("接続が開かれたときに呼び出されるイベント")
 }
-ws.onmessage = function (event) {
+ws.onmessage = function (event: MessageEvent) {
   let info = JSON.parse(event.data)
   info = JSON.parse(info.data)
   if(info.actionId == ActionCede.ADD){
@@ -71,17 +77,17 @@ ws.onmessage = function (event) {
   }
 }
 const coll = () => {
-  let data = {
+  let data:SendMemo = {
       id: "",
       text: "",
       x:0,
       y:0,
-      actionId: 2,
+      actionId: ActionCede.ADD,
       boardId : boardId.value
   }
   ws.send(JSON.stringify(data))
-};
-const moveMemo = (data) => {
+}
+const moveMemo = (data:SendMemo) => {
   for(let i = 0; i < memos.value.length;i++){
       if(memos.value[i].id == data.id){
         memos.value[i].x = data.x
@@ -90,13 +96,13 @@ const moveMemo = (data) => {
       }
     }
   ws.send(JSON.stringify(data))
-};
+}
 
 onMounted( async() => {
 })
 defineExpose({
   coll,
-});
+})
 // watchEffect(() => {});
 // const refresh = () => refreshNuxtData('memos')
 </script>
