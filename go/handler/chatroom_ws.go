@@ -65,7 +65,7 @@ func (cd ChatData) String() string {
 }
 
 // create creates a chatroom and allocates memory.
-func (r *Rooms) create(name string, ctx context.Context, db *mongo.Database, ch chan request.Memo) ChatroomID {
+func (r *Rooms) create(name string, ctx context.Context, db *mongo.Database, ch chan request.Memo, port string) ChatroomID {
 
 	// crID := ChatroomID(uuid.New().String())
 	crID := ChatroomID(name)
@@ -83,7 +83,7 @@ func (r *Rooms) create(name string, ctx context.Context, db *mongo.Database, ch 
 
 	rooms.Wg.Add(1)
 	go cr.broadcaster(rooms.Wg, ctx, db, ch)
-	log.Printf("Chatroom Created - URL : ws://localhost:%v/chatroom/connect", 8080)
+	log.Printf("Chatroom Created - URL : ws://localhost:%v/chatroom/connect", port)
 	return crID
 }
 
