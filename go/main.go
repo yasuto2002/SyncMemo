@@ -76,13 +76,16 @@ func main() {
 	t := &handler.Test{DB: db, CTX: ctx, Validator: v, JWT: jwter}
 	test := r.PathPrefix("/test").Subrouter()
 	test.Use(handler.AuthMiddleware(jwter, loginKvs))
-	test.HandleFunc("/", t.ServeHTTP).Methods(http.MethodGet)
+	test.HandleFunc("", t.ServeHTTP).Methods(http.MethodGet)
 
-	b := &handler.MakeBoard{DB: db, Validator: v}
-	r.HandleFunc("/makeBoard", b.ServeHTTP).Methods(http.MethodPost)
+	board := r.PathPrefix("/board").Subrouter()
+	board.Use(handler.AuthMiddleware(jwter, loginKvs))
+
+	makeBoard := &handler.MakeBoard{DB: db, Validator: v}
+	r.HandleFunc("/makeBoard", makeBoard.ServeHTTP).Methods(http.MethodPost)
 
 	bl := &handler.BoardList{DB: db}
-	r.HandleFunc("/boardList", bl.ServeHTTP).Methods(http.MethodPost)
+	board.HandleFunc("/list", bl.ServeHTTP).Methods(http.MethodPost)
 
 	casual := &handler.Casual{DB: db, Validator: v, Kvs: authKvs}
 	r.HandleFunc("/casual", casual.ServeHTTP).Methods(http.MethodPost)

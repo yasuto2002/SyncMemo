@@ -15,5 +15,6 @@
     import type { Ref } from 'vue'
     const router = useRouter();
     const { $getBoards } = useNuxtApp()
-    const boards:Ref<BoardHistory[]> = await $getBoards()
+    const token = useCookie<{ token: string}>("token")
+    const boards:Ref<BoardHistory[]> = await $getBoards(token.value.token)
 </script>
