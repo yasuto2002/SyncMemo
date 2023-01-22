@@ -19,13 +19,13 @@ type CRResponse struct {
 	Message string     `json:"message,omitempty"`
 }
 
-type CRMiddleware func(CRMiddlewareData, http.ResponseWriter, context.Context, *mongo.Database, chan request.Memo)
+type CRMiddleware func(CRMiddlewareData, http.ResponseWriter, context.Context, *mongo.Database, chan request.Memo, string)
 
 type CRMiddlewareData struct {
 	vars map[string]string
 }
 
-func CR(next CRMiddleware, ctx context.Context, db *mongo.Database, ch chan request.Memo) http.HandlerFunc {
+func CR(next CRMiddleware, ctx context.Context, db *mongo.Database, ch chan request.Memo, port string) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 
 		vars := mux.Vars(r)
@@ -33,11 +33,11 @@ func CR(next CRMiddleware, ctx context.Context, db *mongo.Database, ch chan requ
 		crmd := CRMiddlewareData{}
 		crmd.vars = vars
 
-		next(crmd, rw, ctx, db, ch)
+		next(crmd, rw, ctx, db, ch, port)
 	}
 }
 
-func CreateChatroom(crmd CRMiddlewareData, rw http.ResponseWriter, ctx context.Context, db *mongo.Database, ch chan request.Memo) {
+func CreateChatroom(crmd CRMiddlewareData, rw http.ResponseWriter, ctx context.Context, db *mongo.Database, ch chan request.Memo, port string) {
 
 	crName := crmd.vars["name"]
 	if crName == "" {
@@ -51,7 +51,7 @@ func CreateChatroom(crmd CRMiddlewareData, rw http.ResponseWriter, ctx context.C
 		return
 	}
 
-	crid := rooms.create(crName, ctx, db, ch)
+	crid := rooms.create(crName, ctx, db, ch, port)
 
 	log.Printf("Created Chatroom : %v", crName)
 
@@ -72,7 +72,7 @@ func CreateChatroom(crmd CRMiddlewareData, rw http.ResponseWriter, ctx context.C
 	rw.Write(out)
 }
 
-func ListChatroom(crmd CRMiddlewareData, rw http.ResponseWriter, ctx context.Context, db *mongo.Database, ch chan request.Memo) {
+func ListChatroom(crmd CRMiddlewareData, rw http.ResponseWriter, ctx context.Context, db *mongo.Database, ch chan request.Memo, port string) {
 
 	output := []map[string]string{}
 

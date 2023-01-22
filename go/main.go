@@ -21,16 +21,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const (
-	readBuffSize = 2 << 10
-	writeBuffSize
-)
-
-const (
-	nameHeader = "WS-NAME"
-	idHeader   = "WS-ID"
-)
-
 var port string
 
 func main() {
@@ -66,8 +56,8 @@ func main() {
 	clocker := clock.RealClocker{}
 	jwter, err := auth.NewJWTer(clocker, loginKvs)
 	chatroom := r.PathPrefix("/chatroom").Subrouter()
-	chatroom.HandleFunc("/create/{name}", handler.CR(handler.CreateChatroom, ctx, db, ch)).Methods(http.MethodPost)
-	chatroom.HandleFunc("/list", handler.CR(handler.ListChatroom, ctx, db, ch)).Methods(http.MethodGet)
+	chatroom.HandleFunc("/create/{name}", handler.CR(handler.CreateChatroom, ctx, db, ch, port)).Methods(http.MethodPost)
+	chatroom.HandleFunc("/list", handler.CR(handler.ListChatroom, ctx, db, ch, port)).Methods(http.MethodGet)
 	chatroom.HandleFunc("/connect", handler.ClientMW(handler.ChatroomWSHandler))
 
 	cl := r.PathPrefix("/client").Subrouter()
