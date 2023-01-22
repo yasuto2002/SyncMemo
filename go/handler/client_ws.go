@@ -1,4 +1,4 @@
-package main
+package handler
 
 import (
 	"log"
@@ -38,12 +38,15 @@ func (gc *globalClients) del(cid ClientID) {
 	delete(gc.data, cid)
 }
 
-func clientMW(next func(cl *Client, rw http.ResponseWriter, r *http.Request)) http.HandlerFunc {
+func ClientMW(next func(cl *Client, rw http.ResponseWriter, r *http.Request)) http.HandlerFunc {
 
 	var cid string
 	var conn *websocket.Conn
 	var err error
-
+	const (
+		nameHeader = "WS-NAME"
+		idHeader   = "WS-ID"
+	)
 	return func(rw http.ResponseWriter, r *http.Request) {
 
 		qv := r.URL.Query()

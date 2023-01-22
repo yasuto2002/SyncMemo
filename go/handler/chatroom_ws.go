@@ -1,4 +1,4 @@
-package main
+package handler
 
 import (
 	"context"
@@ -14,6 +14,13 @@ import (
 )
 
 var rooms = Rooms{Data: map[ChatroomID]*Chatroom{}, RWMutex: new(sync.RWMutex), Wg: new(sync.WaitGroup)}
+
+const (
+	readBuffSize = 2 << 10
+	writeBuffSize
+)
+
+var port string
 
 type Broadcast struct {
 	Message     []byte   //実際のメッセージ
@@ -76,7 +83,7 @@ func (r *Rooms) create(name string, ctx context.Context, db *mongo.Database, ch 
 
 	rooms.Wg.Add(1)
 	go cr.broadcaster(rooms.Wg, ctx, db, ch)
-	log.Printf("Chatroom Created - URL : ws://localhost:%v/chatroom/connect", port)
+	log.Printf("Chatroom Created - URL : ws://localhost:%v/chatroom/connect", 8080)
 	return crID
 }
 
@@ -221,7 +228,7 @@ func chatroomConnect(cl *Client, crid string) {
 
 }
 
-func chatroomWSHandler(cl *Client, rw http.ResponseWriter, r *http.Request) {
+func ChatroomWSHandler(cl *Client, rw http.ResponseWriter, r *http.Request) {
 
 	var crid string
 
