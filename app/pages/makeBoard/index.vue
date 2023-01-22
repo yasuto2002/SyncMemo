@@ -5,7 +5,12 @@
       <TemplateCreatedFormats>
         <template v-slot:formatName>ボードを作る</template>
       </TemplateCreatedFormats>
-      <TemplateBoardHistory />
+      <TemplateBoardHistory v-if="authState" />
+      <TemplateRegPromote v-if="!authState"></TemplateRegPromote>
     </div>
   </div>
 </template>
+<script setup>
+const authStore = useAuthStore()
+const {authState} = authStore
+</script>

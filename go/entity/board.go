@@ -1,9 +1,12 @@
 package entity
 
+import "time"
+
 type Board struct {
-	NAME     string
-	MAIL     string
-	PASSWORD string
+	NAME      string
+	MAIL      string
+	PASSWORD  string
+	CreatedAt time.Time
 }
 type GetBoard struct {
 	ID       map[string]string

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"syncmemo/clock"
 	"syncmemo/model"
 	"syncmemo/repository/request"
 
@@ -14,6 +15,7 @@ import (
 type MakeBoard struct {
 	DB        *mongo.Database
 	Validator *validator.Validate
+	Clock     clock.Clocker
 }
 
 func (B *MakeBoard) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
@@ -34,7 +36,7 @@ func (B *MakeBoard) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := model.MakeBords(ctx, B.DB, item)
+	id, err := model.MakeBords(ctx, B.DB, item, B.Clock)
 	if err != nil {
 		RespondJSON(ctx, rw, &ErrResponse{
 			Message: err.Error(),
