@@ -81,7 +81,7 @@ func main() {
 	board := r.PathPrefix("/board").Subrouter()
 	board.Use(handler.AuthMiddleware(jwter, loginKvs))
 
-	makeBoard := &handler.MakeBoard{DB: db, Validator: v}
+	makeBoard := &handler.MakeBoard{DB: db, Validator: v, Clock: clocker}
 	r.HandleFunc("/makeBoard", makeBoard.ServeHTTP).Methods(http.MethodPost)
 
 	bl := &handler.BoardList{DB: db}

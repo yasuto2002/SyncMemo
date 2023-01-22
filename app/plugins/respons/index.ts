@@ -4,7 +4,7 @@ import { string } from 'yup';
 export default defineNuxtPlugin(() => {
     return {
         provide: {
-            getBoards: async(mail:string) : Promise<Ref<BoardHistory[]>> => {
+            getBoards: async(mail:string) : Promise<BoardHistory[]> => {
                 const boards:Ref<Array<BoardHistory>> = ref([])
                 const router = useRouter();
                 const config = useRuntimeConfig()
@@ -16,9 +16,8 @@ export default defineNuxtPlugin(() => {
                     console.log(error)
                     router.push("/error")
                 }
-                boards.value = data.value as Array<BoardHistory>
-                refresh();
-                return boards
+                await refresh()
+                return data.value as Array<BoardHistory>
             }
         }
     }
