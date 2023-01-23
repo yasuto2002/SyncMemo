@@ -62,9 +62,9 @@
     </form>
 </template>
 <script setup lang="ts">
-import makeBoard from '~~/plugins/makeBoard';
-import type {makeBoardRes} from '../../repository/respons/makeBoard';
-import type { Ref } from 'vue';
+import makeBoard from '~~/plugins/makeBoard'
+import type {makeBoardRes} from '../../repository/respons/makeBoard'
+import type { Ref } from 'vue'
 const boardName:Ref<string> = ref("")
 const boardPassword:Ref<string> = ref("")
 const router = useRouter()
@@ -75,7 +75,13 @@ const { authState } = authStore
 const loginStatus = ref(computed(() => authState.value))
 const make = async() =>{
     const { $makeBoard } = useNuxtApp()
-    const id:makeBoardRes = await $makeBoard(boardName.value,boardPassword.value)
+    let id:makeBoardRes = null
+    if(authState){
+        const mail = useCookie<{ address: string}>("mail")
+        id = await $makeBoard(boardName.value,boardPassword.value,mail.value.address)
+    }else{
+        id = await $makeBoard(boardName.value,boardPassword.value,"")
+    }
     if(id === null){
         router.push("/error")
         return

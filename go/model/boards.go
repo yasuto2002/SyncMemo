@@ -19,7 +19,7 @@ func MakeBords(ctx context.Context, db *mongo.Database, item request.Make, clock
 	podcastsCollection := db.Collection("boards")
 	board := entity.Board{
 		NAME:      item.Name,
-		MAIL:      "fujiya0101@gmail.com",
+		MAIL:      item.Mail,
 		PASSWORD:  item.Password,
 		CreatedAt: clock.Now(),
 	}

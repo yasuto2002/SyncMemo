@@ -5,11 +5,11 @@ import type { Make } from '../../repository/request/make'
 export default defineNuxtPlugin(() => {
   return {
     provide: {
-      makeBoard: async (name:string,pass:string) :Promise<makeBoardRes | null> => {
+      makeBoard: async (name:string,pass:string,mail:string) :Promise<makeBoardRes | null> => {
         const router = useRouter();
         const config = useRuntimeConfig()
         const statusCode:Ref<errCode> = ref(200);
-        const make:Make = {name:name,password:pass}
+        const make:Make = {name:name,password:pass,mail:mail}
         const { data, pending, refresh, error }  = await useAsyncData(String(`makeBoard`), () =>
                     $fetch(
                         `${config.apiServer}/makeBoard`,
