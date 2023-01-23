@@ -2,10 +2,8 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
-	"syncmemo/auth"
 	"syncmemo/clock"
 	"syncmemo/model"
 	"syncmemo/repository/request"
@@ -14,21 +12,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type MakeBoard struct {
+type GestMakeBoard struct {
 	DB        *mongo.Database
 	Validator *validator.Validate
 	Clock     clock.Clocker
 }
 
-func (B *MakeBoard) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+func (G *GestMakeBoard) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	mail, ok := auth.GetUserID(ctx)
-	if !ok {
-		RespondJSON(ctx, rw, &ErrResponse{
-			Message: fmt.Errorf("user_id not found").Error(),
-		}, http.StatusInternalServerError)
-		return
-	}
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	var item request.Make
 	if err := json.Unmarshal(reqBody, &item); err != nil {
@@ -38,15 +29,14 @@ func (B *MakeBoard) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := B.Validator.Struct(item); err != nil {
+	if err := G.Validator.Struct(item); err != nil {
 		RespondJSON(ctx, rw, &ErrResponse{
 			Message: err.Error(),
 		}, http.StatusBadRequest)
 		return
 	}
-	item.Mail = mail
 
-	id, err := model.MakeBords(ctx, B.DB, item, B.Clock)
+	id, err := model.MakeBords(ctx, G.DB, item, G.Clock)
 	if err != nil {
 		RespondJSON(ctx, rw, &ErrResponse{
 			Message: err.Error(),

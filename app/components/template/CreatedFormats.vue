@@ -21,7 +21,7 @@
             <input type="checkbox" id="validity" v-model="checked" :disabled="!loginStatus"/>
             <label for="validity" :class="{'opacity-60':!loginStatus}">パスワードを有効にする</label>
             <p class="text-[#ff0000]" v-if="!loginStatus">ログインユーザーのみパスワードを有効にできます</p>
-            <p class="mt-[3vw]" v-bind:class= "{'text-[#F3F5F4]' : !checked}">パスワード</p>
+            <p class="mt-[3vw]" v-bind:class= "{'text-[#F3F5F4]' : !checked || !loginStatus}">パスワード</p>
             <input
             type="password"
             name=""
@@ -35,9 +35,10 @@
                 rounded-[10px]
                 h-10
             "
-            v-bind:class= "{'border-[#ACA5A5]' : checked}"
-            :disabled="!checked"
+            v-bind:class= "{'border-[#ACA5A5]' : checked && loginStatus}"
+            :disabled="!checked || !loginStatus"
             v-model="boardPassword"
+            ref="input"
         />
         </div>
         <div class="w-full flex justify-center">
@@ -71,16 +72,18 @@ const router = useRouter()
 const authStore = useAuthStore()
 const checked = useState('ref1-key', () => false)
 const { $makeBoard } = useNuxtApp()
+const { $gestMakeBoard } = useNuxtApp()
 const { authState } = authStore
 const loginStatus = ref(computed(() => authState.value))
+const input:Ref<HTMLElement> = ref(null)
 const make = async() =>{
     const { $makeBoard } = useNuxtApp()
     let id:makeBoardRes = null
-    if(authState){
-        const mail = useCookie<{ address: string}>("mail")
-        id = await $makeBoard(boardName.value,boardPassword.value,mail.value.address)
+    if(authState.value){
+        const token = useCookie<{ token: string}>("token")
+        id = await $makeBoard(boardName.value,boardPassword.value,token.value.token)
     }else{
-        id = await $makeBoard(boardName.value,boardPassword.value,"")
+        id = await $gestMakeBoard(boardName.value,"")
     }
     if(id === null){
         router.push("/error")
@@ -88,5 +91,11 @@ const make = async() =>{
     }
     router.push({ path: 'board',query: { id: id.id }})
 }
-
+onMounted(() => {
+    watchEffect(() => {
+        if(!loginStatus.value){
+            boardPassword.value = ""
+        }
+    })
+})
 </script>

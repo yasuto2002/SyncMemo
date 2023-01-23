@@ -72,7 +72,10 @@ func main() {
 	board.Use(handler.AuthMiddleware(jwter, loginKvs))
 
 	makeBoard := &handler.MakeBoard{DB: db, Validator: v, Clock: clocker}
-	r.HandleFunc("/makeBoard", makeBoard.ServeHTTP).Methods(http.MethodPost)
+	board.HandleFunc("/make", makeBoard.ServeHTTP).Methods(http.MethodPost)
+
+	gestMakeBoard := &handler.GestMakeBoard{DB: db, Validator: v, Clock: clocker}
+	r.HandleFunc("/gestMakeBoard", gestMakeBoard.ServeHTTP).Methods(http.MethodPost)
 
 	bl := &handler.BoardList{DB: db}
 	board.HandleFunc("/list", bl.ServeHTTP).Methods(http.MethodPost)
