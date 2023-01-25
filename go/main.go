@@ -94,6 +94,11 @@ func main() {
 	memo := &handler.Memos{DB: db, Validator: v}
 	r.HandleFunc("/memos", memo.ServeHTTP).Methods(http.MethodPost)
 
+	loginCheck := r.PathPrefix("/loginCheck").Subrouter()
+	check := &handler.LoginCheck{Validator: v}
+	loginCheck.Use(handler.AuthMiddleware(jwter, loginKvs))
+	loginCheck.HandleFunc("", check.ServeHTTP).Methods(http.MethodPost)
+
 	log.Println("Registered Handlers")
 	log.Printf("Started Server on port : %v", port)
 	headers := handlers.AllowedHeaders([]string{"*", "Content-Type", "*"})

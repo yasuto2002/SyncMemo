@@ -5,4 +5,5 @@ const code = {
     Success:200,
     InternalServerError:500,
     BadRequest:400,
+    Unauthorized:401
 }
