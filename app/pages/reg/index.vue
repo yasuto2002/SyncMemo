@@ -95,7 +95,7 @@
 import { useField, useForm } from "vee-validate"
 import * as yup from "yup"
 import type { Ref } from 'vue'
-const router = useRouter();
+const router = useRouter()
 const config = useRuntimeConfig()
 const validateMes = useValidateMes()
 const { $casual } = useNuxtApp()

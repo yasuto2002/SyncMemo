@@ -13,8 +13,8 @@
   const loginStatus = ref(computed(() => authState.value))
   const logout = async() =>{
     await  authLogout()
-    const logToken =  useCookie('logToken')
-    logToken.value = null
+    const token = useCookie<{ token: string}>("token",{maxAge: 0})
+    token.value = null
   }
 </script>
 
