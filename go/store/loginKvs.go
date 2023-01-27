@@ -37,6 +37,7 @@ func Load(ctx context.Context, rdb *redis.Client, key string) (string, error) {
 	return mail, nil
 }
 
+// ログイントークン削除
 func LoginDelete(ctx context.Context, rdb *redis.Client, key string) error {
 	err := rdb.Del(ctx, key).Err()
 	if err != nil {

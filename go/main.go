@@ -99,6 +99,9 @@ func main() {
 	loginCheck.Use(handler.AuthMiddleware(jwter, loginKvs))
 	loginCheck.HandleFunc("", check.ServeHTTP).Methods(http.MethodPost)
 
+	logout := &handler.Logout{JWTer: jwter, Kvs: loginKvs}
+	r.HandleFunc("/logout", logout.ServeHTTP).Methods(http.MethodPost)
+
 	log.Println("Registered Handlers")
 	log.Printf("Started Server on port : %v", port)
 	headers := handlers.AllowedHeaders([]string{"*", "Content-Type", "*"})

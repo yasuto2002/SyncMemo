@@ -36,17 +36,6 @@ func (t *Test) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		}, http.StatusInternalServerError)
 		return
 	}
-	// ses()
-	// model.MakePodcast(t.CTX, t.DB)
 	u := entity.User{Mail: id}
-	// b, err := t.JWT.GenerateToken(ctx, u)
-	// if err != nil {
-	// 	RespondJSON(ctx, rw, &ErrResponse{
-	// 		Message: err.Error(),
-	// 	}, http.StatusInternalServerError)
-	// 	return
-	// }
-	// test := TestData{A: string(b)}
-	//fmt.Errorf("user_id not found")
 	RespondJSON(ctx, rw, u, http.StatusOK)
 }
