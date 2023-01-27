@@ -128,10 +128,6 @@ const { value: password } = useField("password");
 const { value: conPassword } = useField("conPassword");
 const errMes = ref()
 const result:Ref<boolean> = ref(null)
-const mailCheck:string = route.params.mail as string
-if(typeof mailCheck == "undefined"){
-    router.push("/")
-}
 const onSubmit = handleSubmit(async(values) => {
   result.value = await $casual(values.name,values.mail,values.password)
   if(result.value === true){

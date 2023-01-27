@@ -3,18 +3,24 @@
     <NuxtLink to="/"><img src="~/assets/images/logo.png" class="ml-[5%]" /></NuxtLink>
     <div class="flex items-center">
       <button v-if="loginStatus" @click="logout">ログアウト</button>
-      <NuxtLink to="/login" v-if="!loginStatus" @click="logout">ログイン</NuxtLink>
+      <NuxtLink to="/login" v-if="!loginStatus">ログイン</NuxtLink>
     </div>
   </header>
 </template>
 <script setup lang="ts">
+import type { errCode } from '~~/repository/errCode';
   const authStore = useAuthStore()
+  const http = useHttp()
   const {authState, authLogout} = authStore
   const loginStatus = ref(computed(() => authState.value))
+  const { $tokenDelete } = useNuxtApp()
   const logout = async() =>{
-    await  authLogout()
-    const token = useCookie<{ token: string}>("token",{maxAge: 0})
-    token.value = null
+    const token = useCookie<{ token: string}>("token")
+    if (typeof token.value != "undefined" && token.value != null){
+      let errcode = await $tokenDelete(token.value.token)
+    }
+      await  authLogout()
+      token.value.token= null
   }
 </script>
 
