@@ -1,5 +1,6 @@
 import type {Registration} from '../../repository/request/registration'
 import type { Ref } from 'vue'
+import type {FetchContext,FetchResponse} from 'ohmyfetch'
 export default defineNuxtPlugin(() => {
     return {
         provide: {
@@ -36,6 +37,6 @@ export default defineNuxtPlugin(() => {
         }
     }
 })
-const onResponseError = async (data:any,statusCode:Ref<number>) => {
-	statusCode.value = data.response.status
+const onResponseError = async ({ response }: { response: FetchResponse<Error>},statusCode:Ref<number>) => {
+	statusCode.value = response.status
 };

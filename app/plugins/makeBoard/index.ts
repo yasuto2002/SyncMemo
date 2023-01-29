@@ -2,6 +2,7 @@ import type {makeBoardRes} from '../../repository/respons/makeBoard';
 import type { Ref } from 'vue'
 import type { errCode } from '../../repository/errCode'
 import type { Make } from '../../repository/request/make'
+import type {FetchContext,FetchResponse} from 'ohmyfetch'
 export default defineNuxtPlugin(() => {
   return {
     provide: {
@@ -10,7 +11,7 @@ export default defineNuxtPlugin(() => {
         const config = useRuntimeConfig()
         const statusCode:Ref<errCode> = ref(200);
         const make:Make = {name:name,password:pass}
-        const { data, pending, refresh, error }  = await useAsyncData(String(`makeBoard`), () =>
+        const { data, pending, refresh, error }  = await useAsyncData<makeBoardRes>(String(`makeBoard`), () =>
                     $fetch(
                         `${config.apiServer}/board/make`,
                         { method: 'POST', headers: {
@@ -28,11 +29,11 @@ export default defineNuxtPlugin(() => {
         if(typeof error.value === "boolean"){
             return null
         }
-        return data.value as makeBoardRes
+        return data.value
       }
     }
   }
 })
-const onResponseError = async (data:any,statusCode:Ref<number>) => {
-	statusCode.value = data.response.status
+const onResponseError = async ({ response }: { response: FetchResponse<Error>},statusCode:Ref<number>) => {
+	statusCode.value = response.status
 }
