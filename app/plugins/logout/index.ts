@@ -31,6 +31,6 @@ export default defineNuxtPlugin(() => {
     }
     }
 })
-const onResponseError = async (data:any,statusCode:Ref<number>) => {
-	statusCode.value = data.response.status
+const onResponseError = async ({ response }: { response: FetchResponse<Error>},statusCode:Ref<number>) => {
+	statusCode.value = response.status
 }
