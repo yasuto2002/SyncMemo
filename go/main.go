@@ -80,6 +80,9 @@ func main() {
 	bl := &handler.BoardList{DB: db}
 	board.HandleFunc("/list", bl.ServeHTTP).Methods(http.MethodPost)
 
+	bla := &handler.BoardListAll{DB: db}
+	board.HandleFunc("/listAll", bla.ServeHTTP).Methods(http.MethodPost)
+
 	casual := &handler.Casual{DB: db, Validator: v, Kvs: authKvs}
 	r.HandleFunc("/casual", casual.ServeHTTP).Methods(http.MethodPost)
 

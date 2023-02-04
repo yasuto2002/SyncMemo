@@ -44,3 +44,18 @@ func GetBoardList(ctx context.Context, db *mongo.Database, mail string) ([]respo
 	}
 	return boards, nil
 }
+
+func GetBoardListAll(ctx context.Context, db *mongo.Database, mail string) ([]response.BoardList, error) {
+	filter := &bson.M{"mail": mail}
+	opts := options.Find().SetSort(bson.D{{"createdat", -1}})
+	boardsCollection := db.Collection("boards")
+	cursor, err := boardsCollection.Find(ctx, filter, opts)
+	if err != nil {
+		return nil, fmt.Errorf("FindError")
+	}
+	var boards []response.BoardList
+	if err = cursor.All(ctx, &boards); err != nil {
+		return nil, fmt.Errorf("FindError")
+	}
+	return boards, nil
+}
