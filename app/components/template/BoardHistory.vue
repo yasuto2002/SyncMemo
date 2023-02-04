@@ -7,7 +7,7 @@
             <NuxtLink :to='{ path: "board",query: { id: board.id }}' class="text-[#0000FF] hover:cursor-pointer w-[25%] text-center">開く</NuxtLink>
             <p class="text-[#FF0000] hover:cursor-pointer w-[25%]">削除</p>
         </div>
-        <div class="flex justify-end w-full"><NuxtLink to="/" class="text-[#CACCD0] border-b-[1px] border-[#CACCD0] border-solid">もっと見る</NuxtLink></div>
+        <div class="flex justify-end w-full"><NuxtLink to="/myBoards" class="text-[#CACCD0] border-b-[1px] border-[#CACCD0] border-solid mr-9">もっと見る</NuxtLink></div>
     </div>
 </template>
 <script setup lang="ts">
