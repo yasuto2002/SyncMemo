@@ -1,8 +1,9 @@
 <template>
   <div
-    class="drag-and-drop bg-[#fffdfd] text-[#7c4e4e] rounded-[10px] elv"
+    class="drag-and-drop bg-[#fffdfd] text-[#7c4e4e] rounded-[10px] elv shadow-blue-300"
     id="red-box"
     ref="memo"
+    :class='{"shadow-2xl":opponent,"opacity-50":opponent}'
   >
     <p v-if="view" class="w-full h-full p-[5%]">{{ text }}</p>
     <textarea
@@ -21,6 +22,7 @@
 import { ActionCede } from "../../repository/actionCode"
 import type { SendMemo } from '../../repository/request/sendMemo'
 import type { Ref } from 'vue'
+const opponent:Ref<boolean> = ref(false)
 const memo:Ref<HTMLElement> = ref(null) // refの値をとる
 let view:Ref<boolean> = ref(true);
 let text:Ref<string> = ref()
@@ -30,6 +32,7 @@ const emit = defineEmits<{
 const props = defineProps({
   data: { type: Object, required: true },
   boardId:{ type: String, required: true},
+  do:{ type: Boolean, required: true},
 });
 
 text.value = props.data.memo.text
@@ -41,7 +44,7 @@ const out = () => {
       text: text.value,
       x:y.value,
       y:x.value,
-      actionId:ActionCede.MOVE,
+      actionId:ActionCede.END,
       boardId:props.boardId
   };
   emit("moveMemo",memoData)
@@ -52,7 +55,43 @@ const input = () =>{
       text: text.value,
       x:y.value,
       y:x.value,
+      actionId:ActionCede.INPUT,
+      boardId:props.boardId
+  };
+  emit("moveMemo",memoData)
+}
+
+const move = () =>{
+  let memoData:SendMemo = {
+      id: props.data.memo.id,
+      text: text.value,
+      x:y.value,
+      y:x.value,
       actionId:ActionCede.MOVE,
+      boardId:props.boardId
+  };
+  emit("moveMemo",memoData)
+}
+
+const start = () =>{
+  let memoData:SendMemo = {
+      id: props.data.memo.id,
+      text: text.value,
+      x:y.value,
+      y:x.value,
+      actionId:ActionCede.START,
+      boardId:props.boardId
+  };
+  emit("moveMemo",memoData)
+}
+
+const end = () =>{
+  let memoData:SendMemo = {
+      id: props.data.memo.id,
+      text: text.value,
+      x:y.value,
+      y:x.value,
+      actionId:ActionCede.END,
       boardId:props.boardId
   };
   emit("moveMemo",memoData)
@@ -67,10 +106,16 @@ onMounted(() => {
   memo.value.style.top = props.data.memo.x + 'px'
   memo.value.style.left = props.data.memo.y + 'px'
   var el:HTMLElement = memo.value;
-  watchEffect(() => {
+  watchEffect( () => {
     memo.value.style.top = props.data.memo.x + 'px'
     memo.value.style.left = props.data.memo.y + 'px'
     text.value = props.data.memo.text
+    if(props.do){
+      opponent.value = props.do
+    }else{
+      opponent.value = props.do
+      memo.value.blur()
+    }
   })
   //マウスが要素内で押されたとき、又はタッチされたとき発火
   memo.value.addEventListener("mousedown", mdown)
@@ -105,7 +150,7 @@ onMounted(() => {
     } else {
       var event = e.changedTouches[0];
     }
-
+    start()
     //フリックしたときに画面を動かさないようにデフォルト動作を抑制
     e.preventDefault();
     //マウスが動いた場所に要素を動かす
@@ -114,7 +159,7 @@ onMounted(() => {
     memo.value.style.top = y.value + "px";
     memo.value.style.left =x.value + "px";
 
-    input() //値を送信
+    move() //値を送信
 
     //マウスボタンが離されたとき、またはカーソルが外れたとき発火
     memo.value.addEventListener("mouseup", mup, false);
@@ -132,12 +177,15 @@ onMounted(() => {
       // drag.removeEventListener("touchend", mup, false);
       //クラス名 .drag も消す
       memo.value.classList.remove("drag");
+      end()
   }
 
   function action(e) {
+    start()
     view.value = !view.value;
   }
 });
+
 </script>
 <style scoped>
 .drag-and-drop {
