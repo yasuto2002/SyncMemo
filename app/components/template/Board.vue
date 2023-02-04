@@ -9,6 +9,7 @@
       :key="i"
       :data="{ memo }"
       :boardId="boardId"
+      :do="ary[i]"
       :ref="
         (el) => {
           if (el) memoel[0] = el;
@@ -48,6 +49,8 @@ if(stetusCode.value == 200 && evacuation != null){
   router.push("/error")
 }
 
+const ary:Ref<boolean[]> = ref(new Array<boolean>(memos.value.length).fill(false))
+
 const ws = new WebSocket(config.socket + `/chatroom/connect?name=${boardId.value}&chatroom_id=${boardId.value}`)
 
 ws.onopen = function () {
@@ -56,26 +59,59 @@ ws.onopen = function () {
 ws.onmessage = function (event: MessageEvent) {
   let info = JSON.parse(event.data)
   info = JSON.parse(info.data)
-  if(info.actionId == ActionCede.ADD){
-    let data:Memo = {
-      id: info.id,
-      text: info.text,
-      x:info.x,
-      y:info.y,
-      boardid : boardId.value as string
-    }
-    memos.value.push(data)
-    return
-  }else{
-    for(let i = 0; i < memos.value.length;i++){
-      if(memos.value[i].id == info.id){
-        memos.value[i].x = info.x
-        memos.value[i].y = info.y
-        memos.value[i].text = info.text
+
+  switch(info.actionId){
+    case ActionCede.ADD:
+      let data:Memo = {
+        id: info.id,
+        text: info.text,
+        x:info.x,
+        y:info.y,
+        boardid : boardId.value as string
       }
-    }
+      memos.value.push(data)
+      ary.value.push(false)
+      break
+    case ActionCede.START:
+      for(let i = 0; i < memos.value.length;i++){
+        if(memos.value[i].id == info.id){
+          cheng(i,info)
+          ary.value[i] = true
+        }
+      }
+      break
+    case ActionCede.INPUT:
+      for(let i = 0; i < memos.value.length;i++){
+          if(memos.value[i].id == info.id){
+            cheng(i,info)
+            ary.value[i] = true
+          }
+        }
+      break
+    case ActionCede.END:
+      for(let i = 0; i < memos.value.length;i++){
+        if(memos.value[i].id == info.id){
+          cheng(i,info)
+          ary.value[i] = false
+        }
+      }
+      break
+    default:
+      for(let i = 0; i < memos.value.length;i++){
+        if(memos.value[i].id == info.id){
+          cheng(i,info)
+        }
+      }
   }
+
 }
+
+const cheng = (i:number,info) =>{
+  memos.value[i].x = info.x
+  memos.value[i].y = info.y
+  memos.value[i].text = info.text
+}
+
 const coll = () => {
   let data:SendMemo = {
       id: "",

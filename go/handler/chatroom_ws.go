@@ -158,20 +158,22 @@ func (c *Chatroom) broadcaster(wg *sync.WaitGroup, ctx context.Context, db *mong
 		addData, err := json.Marshal(memo)
 		if err != nil {
 			log.Printf("Error Marshal json: %v", err)
-		} else if err == nil && memo.ActionId == 1 {
+		} else if err == nil && memo.ActionId == 1 || memo.ActionId == 6 {
 			ch <- memo
 		}
 		for id, cl := range c.Clients {
 			if id == b.Cid { //If its the sender then skip
-				chat := ChatData{ //Create chat data and write to connections
-					Name: b.Cname,
-					ID:   b.Cid,
-					Data: string(addData),
-					Type: "text",
-				}
-				if err := cl.Conn.WriteJSON(chat); err != nil {
-					log.Printf("Error occured while sending message : %v", err)
-					continue
+				if memo.ActionId == 2 { //追加
+					chat := ChatData{
+						Name: b.Cname,
+						ID:   b.Cid,
+						Data: string(addData),
+						Type: "text",
+					}
+					if err := cl.Conn.WriteJSON(chat); err != nil {
+						log.Printf("Error occured while sending message : %v", err)
+						continue
+					}
 				}
 				continue
 			}
