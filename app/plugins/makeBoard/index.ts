@@ -6,7 +6,7 @@ import type {FetchContext,FetchResponse} from 'ohmyfetch'
 export default defineNuxtPlugin(() => {
   return {
     provide: {
-      makeBoard: async (name:string,pass:string,token:string) :Promise<makeBoardRes | null> => {
+      makeBoard: async (name:string,pass:string,token:string) :Promise<[makeBoardRes,errCode]> => {
         const router = useRouter();
         const config = useRuntimeConfig()
         const statusCode:Ref<errCode> = ref(200);
@@ -27,9 +27,9 @@ export default defineNuxtPlugin(() => {
                     }
                 )
         if(typeof error.value === "boolean"){
-            return null
+            return [null,statusCode.value]
         }
-        return data.value
+        return [data.value,statusCode.value]
       }
     }
   }

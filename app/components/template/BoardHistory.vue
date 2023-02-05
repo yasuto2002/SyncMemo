@@ -13,7 +13,7 @@
 <script setup lang="ts">
     import type {Boards,BoardHistory} from "../../repository/respons/boardList"
     import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
-    import { errCode } from "../../repository/errCode";
+    import { errCode } from "../../repository/errCode"
     import type { Ref } from 'vue'
     const router = useRouter()
     const { $getBoards } = useNuxtApp()
@@ -24,7 +24,19 @@
     const { authState } = authStore
     const http = useHttp()
     const boardListSet = async()=>{
-        boards.value = await $getBoards(token.value.token)
+        let code:errCode
+        [boards.value,code] = await $getBoards(token.value.token)
+        switch (code){
+            case http.value.InternalServerError:
+                router.push("/error")
+                break
+            case http.value.BadRequest:
+                router.push("/error")
+                break
+            case http.value.Unauthorized:
+                router.push("/login")
+                break
+        }
     }
     boardListSet()
     const formatDate = (dString:string)=>  {

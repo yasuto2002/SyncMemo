@@ -95,6 +95,7 @@
 import { useField, useForm } from "vee-validate"
 import * as yup from "yup"
 import type { Ref } from 'vue'
+import { errCode } from "../../repository/errCode"
 const router = useRouter()
 const config = useRuntimeConfig()
 const validateMes = useValidateMes()
@@ -127,17 +128,29 @@ const { value: name } = useField("name")
 const { value: password } = useField("password");
 const { value: conPassword } = useField("conPassword");
 const errMes = ref()
+const http = useHttp()
 const result:Ref<boolean> = ref(null)
 const onSubmit = handleSubmit(async(values) => {
-  result.value = await $casual(values.name,values.mail,values.password)
-  if(result.value === true){
-    const mail = useCookie<{ address: string}>("mail",{maxAge: 3600})
-    mail.value = {address:values.mail}
-    router.push({ name: 'reg-token', params: { mail: values.mail } })
+  let code:errCode
+  code = await $casual(values.name,values.mail,values.password)
+  switch (code){
+      case http.value.InternalServerError:
+          router.push("/error")
+          break
+      case http.value.BadRequest:
+          router.push("/error")
+          break
+      case http.value.Unauthorized:
+          router.push("/login")
+          break
+      default:
+      const mail = useCookie<{ address: string}>("mail",{maxAge: 3600})
+      mail.value = {address:values.mail}
+      router.push({ name: 'reg-token', params: { mail: values.mail } })
   }
   refresh()
 })
-const refresh = () => refreshNuxtData('result')
+const refresh = () => refreshNuxtData('code')
 </script>
 
 <style scoped>

@@ -26,10 +26,23 @@
     const authStore = useAuthStore()
     const { authState } = authStore
     const http = useHttp()
+    let code:errCode
     const boardListSet = async()=>{
-        boards.value = await $getBoardsAll(token.value.token)
-        length.value = boards.value.length
-        arryCalc()
+        [boards.value,code] = await $getBoardsAll(token.value.token)
+        switch (code){
+            case http.value.InternalServerError:
+                router.push("/error")
+                break
+                case http.value.BadRequest:
+                router.push("/error")
+                break
+            case http.value.Unauthorized:
+                router.push("/login")
+                break
+            default:
+            length.value = boards.value.length
+            arryCalc()
+        }
     }
     boardListSet()
 

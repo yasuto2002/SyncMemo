@@ -88,8 +88,13 @@ const { value: password } = useField("password");
 
 const onSubmit = handleSubmit(async(values) => {
     [login,errNumber.value] = await $login(values.mail,values.password)
-    if (login == null){
-        return
+    switch (errNumber.value){
+        case http.value.InternalServerError:
+            router.push("/error")
+            break
+        case http.value.BadRequest:
+            router.push("/error")
+            break
     }
     console.log("成功");
     authLogin() 

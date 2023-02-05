@@ -25,29 +25,51 @@ import type { errCode } from '../../repository/errCode'
 import type { Ref } from 'vue'
 import type { Memo } from '../../repository/respons/memo'
 import type { SendMemo } from '../../repository/request/sendMemo'
-
+import type { createRoom } from "~~/repository/respons/createRoom"
 
 const route = useRoute()
 const router = useRouter()
 const config = useRuntimeConfig()
 const { $createRoom } = useNuxtApp()
 const { $memos } = useNuxtApp()
+const http = useHttp()
 
 const boardId:Ref<string> = ref(route.query.id as string)
 const memoel = ref([])
 let memos:Ref<Array<Memo>> = ref(new Array)
 const stetusCode:Ref<errCode> =  ref(200)
 
-$createRoom(boardId.value as string)
-
+let [_,code] = await $createRoom(boardId.value as string)
+switch (code){
+  case http.value.InternalServerError:
+      router.push("/error")
+      break
+  case http.value.Unauthorized:
+      router.push("/error")
+      break
+  case http.value.Unauthorized:
+      router.push("/login")
+      break
+}
 let evacuation:Array<Memo>
 [evacuation,stetusCode.value] = await $memos(boardId.value as string)
-if(stetusCode.value == 200 && evacuation != null){
-  memos.value = evacuation
-}else if(evacuation == null){
-  memos.value = new Array
-}else{
-  router.push("/error")
+
+switch (code){
+  case http.value.InternalServerError:
+      router.push("/error")
+      break
+  case http.value.BadRequest:
+      router.push("/error")
+      break
+  case http.value.Unauthorized:
+      router.push("/login")
+      break
+  default:
+  if(stetusCode.value == 200 && evacuation != null){
+      memos.value = evacuation
+  }else if(evacuation == null){
+    memos.value = new Array
+  }
 }
 
 const ary:Ref<boolean[]> = ref(new Array<boolean>(memos.value.length).fill(false))
