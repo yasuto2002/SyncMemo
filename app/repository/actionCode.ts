@@ -3,5 +3,6 @@ export const ActionCede =  {
     ADD:2,
     START:4,
     END:5,
-    INPUT:6
+    INPUT:6,
+    DELETE:7
 }

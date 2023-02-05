@@ -154,6 +154,11 @@ func (c *Chatroom) broadcaster(wg *sync.WaitGroup, ctx context.Context, db *mong
 				log.Printf("Error Insert Memo : %v", err)
 			}
 			memo.Id = id
+		} else if memo.ActionId == 7 {
+			err := model.DeleteMemo(ctx, db, memo.Id)
+			if err != nil {
+				log.Printf("Error Insert Memo : %v", err)
+			}
 		}
 		addData, err := json.Marshal(memo)
 		if err != nil {
