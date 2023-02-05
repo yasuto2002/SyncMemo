@@ -49,7 +49,7 @@ func main() {
 
 	ch := make(chan request.Memo)
 
-	for i := 0; i < 2; i++ {
+	for i := 0; i < 3; i++ {
 		go model.AddCh(ctx, db, ch)
 	}
 
@@ -104,6 +104,9 @@ func main() {
 
 	logout := &handler.Logout{JWTer: jwter, Kvs: loginKvs}
 	r.HandleFunc("/logout", logout.ServeHTTP).Methods(http.MethodPost)
+
+	bd := &handler.BoardDelete{DB: db, Validator: v}
+	board.HandleFunc("/delete", bd.ServeHTTP).Methods(http.MethodPost)
 
 	log.Println("Registered Handlers")
 	log.Printf("Started Server on port : %v", port)

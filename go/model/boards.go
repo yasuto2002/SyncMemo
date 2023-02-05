@@ -59,3 +59,21 @@ func GetBoardListAll(ctx context.Context, db *mongo.Database, mail string) ([]re
 	}
 	return boards, nil
 }
+
+func DeleteBoards(ctx context.Context, db *mongo.Database, boardId string, mail string) error {
+	memoFilter := &bson.M{"boardid": boardId}
+	memoCollection := db.Collection("Memos")
+	if _, err := memoCollection.DeleteMany(ctx, memoFilter); err != nil {
+		return fmt.Errorf("MemoDeleteError")
+	}
+	id, err := primitive.ObjectIDFromHex(boardId)
+	if err != nil {
+		return fmt.Errorf("id chenge error")
+	}
+	filter := &bson.M{"_id": id, "mail": mail}
+	boardsCollection := db.Collection("boards")
+	if _, err := boardsCollection.DeleteOne(ctx, filter); err != nil {
+		return fmt.Errorf("BoardDeleteError")
+	}
+	return nil
+}
