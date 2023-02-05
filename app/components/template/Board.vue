@@ -26,6 +26,7 @@ import type { Ref } from 'vue'
 import type { Memo } from '../../repository/respons/memo'
 import type { SendMemo } from '../../repository/request/sendMemo'
 
+
 const route = useRoute()
 const router = useRouter()
 const config = useRuntimeConfig()
@@ -96,6 +97,9 @@ ws.onmessage = function (event: MessageEvent) {
         }
       }
       break
+    case ActionCede.DELETE:
+      deletMemo(info.id)
+      break
     default:
       for(let i = 0; i < memos.value.length;i++){
         if(memos.value[i].id == info.id){
@@ -106,10 +110,21 @@ ws.onmessage = function (event: MessageEvent) {
 
 }
 
+
+//受け取ったメモデータを反映
 const cheng = (i:number,info) =>{
   memos.value[i].x = info.x
   memos.value[i].y = info.y
   memos.value[i].text = info.text
+}
+
+//メモ削除
+const deletMemo = (id:string)=>{
+  for(let i = 0; i < memos.value.length;i++){
+    if(memos.value[i].id == id){
+      memos.value.splice(i,1)
+    }
+  }
 }
 
 const coll = () => {
@@ -130,7 +145,10 @@ const moveMemo = (data:SendMemo) => {
         memos.value[i].y = data.y
         memos.value[i].text = data.text
       }
-    }
+  }
+  if(data.actionId == ActionCede.DELETE){
+    deletMemo(data.id)
+  }
   ws.send(JSON.stringify(data))
 }
 

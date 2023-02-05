@@ -1,20 +1,23 @@
 <template>
   <div
-    class="drag-and-drop bg-[#fffdfd] text-[#7c4e4e] rounded-[10px] elv shadow-blue-300"
+    class="drag-and-drop bg-[#fffdfd] text-[#7c4e4e] rounded-[10px] elv shadow-blue-300 relative"
     id="red-box"
     ref="memo"
     :class='{"shadow-2xl":opponent,"opacity-50":opponent}'
   >
-    <p v-if="view" class="w-full h-full p-[5%]">{{ text }}</p>
+    <p v-if="view" class="w-full h-full p-[10%]">{{ text }}</p>
     <textarea
       name=""
       id=""
       v-model="(text)"
       v-if="!view"
-      class="resize-none focus:outline-none w-full h-full p-[5%]"
+      class="resize-none focus:outline-none w-full h-full p-[10%]"
       @blur="out"
       @keyup="input"
     ></textarea>
+    <div class="absolute bg-red-400 top-0 right-0 rounded-[10%] opacity-70 hover:cursor-pointer" :class="cloer()" @click="deleteMome">
+      &times;
+    </div>
   </div>
 </template>
 <script setup lang="ts">
@@ -39,66 +42,56 @@ text.value = props.data.memo.text
 
 const out = () => {
   view.value = !view.value;
-  let memoData:SendMemo = {
-      id: props.data.memo.id,
-      text: text.value,
-      x:y.value,
-      y:x.value,
-      actionId:ActionCede.END,
-      boardId:props.boardId
-  };
+  let memoData:SendMemo = makeSendMemo(ActionCede.END)
   emit("moveMemo",memoData)
 };
 const input = () =>{
-  let memoData:SendMemo = {
-      id: props.data.memo.id,
-      text: text.value,
-      x:y.value,
-      y:x.value,
-      actionId:ActionCede.INPUT,
-      boardId:props.boardId
-  };
+  let memoData:SendMemo = makeSendMemo(ActionCede.INPUT)
   emit("moveMemo",memoData)
 }
 
 const move = () =>{
-  let memoData:SendMemo = {
-      id: props.data.memo.id,
-      text: text.value,
-      x:y.value,
-      y:x.value,
-      actionId:ActionCede.MOVE,
-      boardId:props.boardId
-  };
+  let memoData:SendMemo = makeSendMemo(ActionCede.MOVE)
   emit("moveMemo",memoData)
 }
 
 const start = () =>{
-  let memoData:SendMemo = {
-      id: props.data.memo.id,
-      text: text.value,
-      x:y.value,
-      y:x.value,
-      actionId:ActionCede.START,
-      boardId:props.boardId
-  };
+  let memoData:SendMemo = makeSendMemo(ActionCede.START)
   emit("moveMemo",memoData)
 }
 
 const end = () =>{
-  let memoData:SendMemo = {
+  let memoData:SendMemo = makeSendMemo(ActionCede.END)
+  emit("moveMemo",memoData)
+}
+
+const deleteMome = () =>{
+  let memoData:SendMemo = makeSendMemo(ActionCede.DELETE)
+  emit("moveMemo",memoData)
+}
+
+const makeSendMemo =(actionCode:number) :SendMemo =>{
+  let memo:SendMemo = {
       id: props.data.memo.id,
       text: text.value,
       x:y.value,
       y:x.value,
-      actionId:ActionCede.END,
+      actionId:actionCode,
       boardId:props.boardId
-  };
-  emit("moveMemo",memoData)
+  }
+  return memo
 }
 
 let x = ref(0)
 let y = ref(0)
+
+const colorList:Ref<string[]> = ref([
+  "bg-red-400","bg-blue-400","bg-emerald-400"
+])
+
+const cloer = () :string =>  {
+  return colorList.value[Math.floor( Math.random() * colorList.value.length)]
+}
 
 onMounted(() => {
   let kx:number

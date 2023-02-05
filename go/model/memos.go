@@ -65,6 +65,7 @@ func UpdateMemo(ctx context.Context, db *mongo.Database, memo request.Memo) {
 	}
 }
 
+// チャンネルからmongoに入れていく
 func AddCh(ctx context.Context, db *mongo.Database, ch chan request.Memo) {
 	for {
 		select {
@@ -74,4 +75,17 @@ func AddCh(ctx context.Context, db *mongo.Database, ch chan request.Memo) {
 			//fmt.Println("No value")
 		}
 	}
+}
+
+func DeleteMemo(ctx context.Context, db *mongo.Database, memoId string) error {
+	memoCollection := db.Collection("Memos")
+	id, err := primitive.ObjectIDFromHex(memoId)
+	filter := &bson.M{"_id": id}
+	if err != nil {
+		return fmt.Errorf("id chenge error")
+	}
+	if _, err := memoCollection.DeleteOne(ctx, filter); err != nil {
+		return fmt.Errorf("BoardDeleteError")
+	}
+	return nil
 }
