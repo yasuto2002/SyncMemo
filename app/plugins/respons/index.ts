@@ -2,12 +2,13 @@ import type {BoardHistory}  from '../../repository/respons/boardList'
 import type { Ref } from 'vue'
 import { string } from 'yup'
 import type {FetchContext,FetchResponse} from 'ohmyfetch'
+import { errCode } from '~~/repository/errCode'
 
 export default defineNuxtPlugin(() => {
     return {
         provide: {
-            getBoards: async(token:string) : Promise<BoardHistory[]> => {
-                const statusCode = ref(0)
+            getBoards: async(token:string) : Promise<[BoardHistory[],errCode]> => {
+                const statusCode:Ref = ref(200)
                 const boards:Ref<Array<BoardHistory>> = ref([])
                 const router = useRouter();
                 const config = useRuntimeConfig()
@@ -31,7 +32,7 @@ export default defineNuxtPlugin(() => {
                     router.push("/error")
                 }
                 await refresh()
-                return data.value
+                return [data.value,statusCode.value]
             }
         }
     }

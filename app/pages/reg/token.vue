@@ -39,6 +39,7 @@
     import { useField, useForm } from "vee-validate"
     import * as yup from "yup"
     import type { Ref } from 'vue'
+    import { errCode } from "../../repository/errCode"
     const validateMes = useValidateMes()
     const config = useRuntimeConfig()
     const authStore = useAuthStore()
@@ -46,6 +47,7 @@
     const {authState} = authStore
     const { $reg } = useNuxtApp()
     const router = useRouter()
+    const http = useHttp()
     const schema = yup.object({
     token: yup.number().max(9999,validateMes.value.max).required(validateMes.value.required).min(1111,"桁少ない").nullable()
         .transform((value, originalValue) =>
@@ -71,13 +73,21 @@
     const result:Ref<boolean> = ref(true)
     // const regData = await useCookie('regData',60 * 60)
     const onSubmit = handleSubmit(async(values) => {
-        result.value = await $reg(mail,values.token)
-        if(result.value){
-            router.push("/")
-            authLogin() 
-            console.log(authState.value)
-        }else if(result.value === null){
-            router.push("/error")
+        let code:errCode
+        code = await $reg(mail,values.token)
+        switch (code){
+            case http.value.InternalServerError:
+                router.push("/error")
+                break
+            case http.value.BadRequest:
+                router.push("/reg")
+                break
+            case http.value.Unauthorized:
+                router.push("/login")
+                break
+            default:
+                router.push("/login")
+                alert("完了！")
         }
     })
 </script>

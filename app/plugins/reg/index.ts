@@ -1,10 +1,11 @@
 import type {Registration} from '../../repository/request/registration'
 import type { Ref } from 'vue'
 import type {FetchContext,FetchResponse} from 'ohmyfetch'
+import { errCode } from '~~/repository/errCode'
 export default defineNuxtPlugin(() => {
     return {
         provide: {
-            reg: async (mail:string,token:string) :Promise<boolean> => {
+            reg: async (mail:string,token:string) :Promise<errCode> => {
                 const statusCode = ref(0)
                 const router = useRouter();
                 const config = useRuntimeConfig()
@@ -22,17 +23,7 @@ export default defineNuxtPlugin(() => {
                         initialCache: false
                     }
                 )
-                if(statusCode.value != 200){
-                    switch (statusCode.value) {
-                        case http.value.InternalServerError:
-                            return null
-                            break
-                        case http.value.BadRequest:
-                            return false
-                            break
-                    }
-                }
-                return true
+                return statusCode.value
             }
         }
     }

@@ -70,6 +70,7 @@ import * as yup from "yup"
 import makeBoard from '~~/plugins/makeBoard'
 import type {makeBoardRes} from '../../repository/respons/makeBoard'
 import type { Ref } from 'vue'
+import { errCode } from "../../repository/errCode"
 const router = useRouter()
 const authStore = useAuthStore()
 const checked = useState('ref1-key', () => false)
@@ -79,6 +80,7 @@ const { authState } = authStore
 const loginStatus = ref(computed(() => authState.value))
 const input:Ref<HTMLElement> = ref(null)
 const validateMes = useValidateMes()
+const http = useHttp()
 const schema = yup.object({
     name: yup.string().max(255,validateMes.value.max).required(validateMes.value.required).matches(validateMes.value.regex, validateMes.value.regexMes).trim(),
     password:yup.string().max(20, validateMes.value.max).matches(validateMes.value.regex, validateMes.value.regexMes),
@@ -96,19 +98,27 @@ const { errors, meta, handleSubmit } = useForm({
 const { value: name } = useField("name")
 const { value: password } = useField("password")
 const onSubmit = handleSubmit(async(values) => {
-    const { $makeBoard } = useNuxtApp()
-    let id:makeBoardRes = null
+    let makeBoardRes:makeBoardRes = null
+    const statusCode:Ref<errCode> = ref(200)
     if(authState.value){
-        const token = useCookie<{ token: string}>("token")
-        id = await $makeBoard(values.name,values.password,token.value.token)
+        [makeBoardRes,statusCode.value] = await $makeBoard(values.name,values.password,useCookie<{ token: string}>("token").value.token)
     }else{
-        id = await $gestMakeBoard(values.name,"")
+        [makeBoardRes,statusCode.value] = await $gestMakeBoard(values.name,"")
     }
-    if(id === null){
-        router.push("/error")
-        return
+    switch (statusCode.value){
+        case http.value.InternalServerError:
+            router.push("/error")
+            break
+        case http.value.BadRequest:
+            router.push("/error")
+            break
+        case http.value.Unauthorized:
+            router.push("/login")
+            break
+        default:
+        router.push({ path: 'board',query: { id: makeBoardRes.id }})
     }
-    router.push({ path: 'board',query: { id: id.id }})
+    return
 })
 onMounted(() => {
     watchEffect(() => {
