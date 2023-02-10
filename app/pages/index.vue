@@ -4,13 +4,13 @@
       class="mb-[9vw] text-[#686868]"
       style="text-shadow: 1px 2px 3px #808080"
     >
-      メモの共有化で
+      メモをリアルタイムで共有することで
     </h1>
     <h1
       class="mb-[8vw] text-[#686868]"
       style="text-shadow: 1px 2px 3px #808080"
     >
-      会議をもっと有益に行う
+    チームの共同作業をもっと有効に
     </h1>
     <div class="flex items-center justify-center mb-[4vw]">
       <img
