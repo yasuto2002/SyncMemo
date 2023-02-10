@@ -8,7 +8,7 @@ export default defineNuxtPlugin(() => {
     return {
         provide: {
             getBoardsAll: async(token:string) : Promise<[BoardHistory[],errCode]> => {
-                const statusCode = ref(0)
+                const statusCode = ref(200)
                 const boards:Ref<Array<BoardHistory>> = ref([])
                 const router = useRouter();
                 const config = useRuntimeConfig()

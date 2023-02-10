@@ -21,7 +21,7 @@
       />
     </div>
     <div class="mt-12">
-      <p class="text-[#ff0000] text-[12px]" v-if="result===false">メールアドレスがすでに使われています</p>
+      <p class="text-[#ff0000] text-[12px]" v-if="code===http.BadRequest">メールアドレスがすでに使われています</p>
       <p class="text-[#ff0000] text-[12px]">{{ errors.mail}}</p>
       <p class="text-[#BCB8B8]">メールアドレス</p>
       <input
@@ -130,15 +130,15 @@ const { value: conPassword } = useField("conPassword");
 const errMes = ref()
 const http = useHttp()
 const result:Ref<boolean> = ref(null)
+let code:Ref<errCode> = ref()
 const onSubmit = handleSubmit(async(values) => {
-  let code:errCode
-  code = await $casual(values.name,values.mail,values.password)
-  switch (code){
+  code.value = await $casual(values.name,values.mail,values.password)
+  console.log(code.value)
+  switch (code.value){
       case http.value.InternalServerError:
           router.push("/error")
           break
       case http.value.BadRequest:
-          router.push("/error")
           break
       case http.value.Unauthorized:
           router.push("/login")

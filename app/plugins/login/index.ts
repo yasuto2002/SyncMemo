@@ -23,17 +23,7 @@ export default defineNuxtPlugin(() => {
                         initialCache: false
                     }
                 )
-                if(statusCode.value != http.value.Success){
-                    switch (statusCode.value) {
-                        case http.value.InternalServerError:
-                            return [null,statusCode.value]
-                        
-                        case http.value.BadRequest:
-                            return [null,statusCode.value]
-                    }
-                }else{
-                    return [data.value as ResLogin,statusCode.value]
-                }
+                return [data.value as ResLogin,statusCode.value]
             }
         }
     }

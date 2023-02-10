@@ -26,10 +26,12 @@ export default defineNuxtRouteMiddleware(async(to, from) => {
                     initialCache: false
                 }
             )
-            if(typeof error.value === "boolean" || statusCode.value == http.value.Unauthorized || statusCode.value == http.value.InternalServerError){
+            if(error.value || statusCode.value == http.value.Unauthorized || statusCode.value == http.value.InternalServerError){
                 return
             }
-            authLogin()
+            else if(statusCode.value == http.value.Success){
+                authLogin()
+            }
     }
 })
 const onResponseError = async (data:any,statusCode:Ref<number>) => {

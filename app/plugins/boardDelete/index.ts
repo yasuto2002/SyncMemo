@@ -8,7 +8,7 @@ export default defineNuxtPlugin(() => {
     return {
         provide: {
             boardDelete: async(token:string,id:string) : Promise<errCode> => {
-                const statusCode:Ref<errCode> = ref(0)
+                const statusCode:Ref<errCode> = ref(200)
                 const router = useRouter();
                 const config = useRuntimeConfig()
                 const boardDelete:boardDelete = { boardId : id}

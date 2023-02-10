@@ -80,7 +80,7 @@ const { errors, meta, handleSubmit } = useForm({
     },
 });
 let login:Login = null
-let errNumber:Ref<errCode> = ref(http.value.Success)
+let errNumber:Ref<number> = ref()
 
 
 const { value: mail } = useField("mail")
@@ -88,21 +88,22 @@ const { value: password } = useField("password");
 
 const onSubmit = handleSubmit(async(values) => {
     [login,errNumber.value] = await $login(values.mail,values.password)
+    console.log(errNumber.value)
     switch (errNumber.value){
         case http.value.InternalServerError:
             router.push("/error")
             break
         case http.value.BadRequest:
-            router.push("/error")
             break
+        case http.value.Success:
+            console.log("成功");
+            authLogin() 
+            let token = useCookie<{ token: string}>("token",{maxAge: 3600})
+            token.value = {token:login.token}
+            let cookieMail = useCookie<{ address: string}>("mail",{maxAge: 3600})
+            cookieMail.value = {address:values.mail}
+            router.push("/")
     }
-    console.log("成功");
-    authLogin() 
-    let token = useCookie<{ token: string}>("token",{maxAge: 3600})
-    token.value = {token:login.token}
-    let cookieMail = useCookie<{ address: string}>("mail",{maxAge: 3600})
-    cookieMail.value = {address:values.mail}
-    router.push("/")
 });
 </script>
 

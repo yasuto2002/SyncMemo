@@ -6,7 +6,7 @@ export default defineNuxtPlugin(() => {
     return {
         provide: {
             reg: async (mail:string,token:string) :Promise<errCode> => {
-                const statusCode = ref(0)
+                const statusCode = ref(200)
                 const router = useRouter();
                 const config = useRuntimeConfig()
                 const http = useHttp()
