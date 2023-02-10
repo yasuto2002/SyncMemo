@@ -9,7 +9,7 @@
     <textarea
       name=""
       id=""
-      v-model="(text)"
+      v-model="text"
       v-if="!view"
       class="resize-none focus:outline-none w-full h-full p-[10%]"
       @blur="out"
@@ -70,13 +70,13 @@ const deleteMome = () =>{
   emit("moveMemo",memoData)
 }
 
-const makeSendMemo =(actionCode:number) :SendMemo =>{
+const makeSendMemo =(codeNumber:number) :SendMemo =>{
   let memo:SendMemo = {
       id: props.data.memo.id,
       text: text.value,
       x:y.value,
       y:x.value,
-      actionId:actionCode,
+      actionId:codeNumber,
       boardId:props.boardId
   }
   return memo
