@@ -83,7 +83,7 @@ func (r *Rooms) create(name string, ctx context.Context, db *mongo.Database, ch 
 
 	rooms.Wg.Add(1)
 	go cr.broadcaster(rooms.Wg, ctx, db, ch)
-	log.Printf("Chatroom Created - URL : ws://localhost:%v/chatroom/connect", port)
+	// log.Printf("Chatroom Created - URL : ws://localhost:%v/chatroom/connect", port)
 	return crID
 }
 

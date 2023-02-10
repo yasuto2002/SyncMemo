@@ -1,5 +1,12 @@
 <template>
-  <div
+  <div>
+    <div class="flex justify-between w-[40%] mb-[1%] ml-[5%]">
+        <PartsBoardName>3限算数の時間</PartsBoardName>
+        <button @click="add" class="text-[#D8CFCF]">
+        メモ追加
+        </button>
+    </div>
+    <div
     class="w-[1200px] h-[1000px] bg-[#F3F3F3] m-auto"
     style="overflow: hidden; position: relative; box-sizing: border-box"
   >
@@ -18,6 +25,8 @@
       @moveMemo="moveMemo"
     />
   </div>
+  </div>
+  
 </template>
 <script setup lang="ts">
 import { ActionCede } from "../../repository/actionCode"
@@ -149,7 +158,7 @@ const deletMemo = (id:string)=>{
   }
 }
 
-const coll = () => {
+const add = () => {
   let data:SendMemo = {
       id: "",
       text: "",
@@ -177,7 +186,7 @@ const moveMemo = (data:SendMemo) => {
 onMounted( async() => {
 })
 defineExpose({
-  coll,
+  add,
 })
 // watchEffect(() => {});
 // const refresh = () => refreshNuxtData('memos')
