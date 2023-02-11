@@ -63,9 +63,9 @@ func main() {
 	cl := r.PathPrefix("/client").Subrouter()
 	cl.HandleFunc("/list", handler.ListAllClients).Methods(http.MethodGet)
 
+	//albヘルスチェック
 	t := &handler.Test{DB: db, CTX: ctx, Validator: v, JWT: jwter}
 	test := r.PathPrefix("/test").Subrouter()
-	test.Use(handler.AuthMiddleware(jwter, loginKvs))
 	test.HandleFunc("", t.ServeHTTP).Methods(http.MethodGet)
 
 	board := r.PathPrefix("/board").Subrouter()
