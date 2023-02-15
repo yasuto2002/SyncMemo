@@ -116,7 +116,7 @@ const onSubmit = handleSubmit(async(values) => {
             router.push("/login")
             break
         default:
-        router.push({ path: 'board',query: { id: makeBoardRes.id }})
+        router.push({ path: 'board',query: { id: makeBoardRes.id,name:values.name}})
     }
     return
 })

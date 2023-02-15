@@ -1,7 +1,9 @@
 <template>
   <div>
+    <PartsModalUrl></PartsModalUrl>
     <div class="flex justify-between w-[40%] mb-[1%] ml-[5%]">
-        <PartsBoardName>3限算数の時間</PartsBoardName>
+        <PartsBoardName>{{ route.query.name }}</PartsBoardName>
+        <label for="my-modal" class="text-[#D8CFCF]">共有</label>
         <button @click="add" class="text-[#D8CFCF]">
         メモ追加
         </button>

@@ -31,7 +31,8 @@ export default defineNuxtConfig({
     public: {
       apiServer: process.env.APISERVER,
       apiContainer: process.env.APICONTAINER,
-      socket: process.env.SOCKET
+      socket: process.env.SOCKET,
+      domain: process.env.DOMAIN,
     }
   },
   alias: {
