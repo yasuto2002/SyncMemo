@@ -4,7 +4,7 @@
         <div class="flex items-center justify-around my-10" v-for="(board,i) in boards">
             <p class="w-[25%]">{{board.name}}</p>
             <p class="w-[25%]">{{ formatDate(board.createdAt) }}</p>
-            <NuxtLink :to='{ path: "board",query: { id: board.id }}' class="text-[#0000FF] hover:cursor-pointer w-[25%] text-center">開く</NuxtLink>
+            <NuxtLink :to='{ path: "board",query: { id: board.id,name:board.name }}' class="text-[#0000FF] hover:cursor-pointer w-[25%] text-center">開く</NuxtLink>
             <p class="text-[#FF0000] hover:cursor-pointer w-[25%] text-center" @click="bdDelete(board.id)">削除</p>
         </div>
         <div class="flex justify-end w-full"><NuxtLink to="/myBoards" class="text-[#CACCD0] border-b-[1px] border-[#CACCD0] border-solid mr-9">もっと見る</NuxtLink></div>

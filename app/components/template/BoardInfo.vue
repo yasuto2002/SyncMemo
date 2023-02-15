@@ -1,6 +1,6 @@
 <template>
     <div class="flex items-center justify-around my-[5vw]">
-        <p>{{boardInfo.name}}</p><p>{{ formatDate(boardInfo.createdAt) }}</p><Nuxt-link :to='{ path: "board",query: { id: boardInfo.id }}' class="text-[#0000FF]">開く</Nuxt-link><button class="text-[#FF0000]" @click="boardDelete">削除</button>
+        <p>{{boardInfo.name}}</p><p>{{ formatDate(boardInfo.createdAt) }}</p><Nuxt-link :to='{ path: "board",query: { id: boardInfo.id,name:boardInfo.name }}' class="text-[#0000FF]">開く</Nuxt-link><button class="text-[#FF0000]" @click="boardDelete">削除</button>
     </div>
 </template>
 <script setup lang="ts">
