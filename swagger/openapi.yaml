@@ -1,0 +1,56 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: SYNCMEMOAPI
+  description: >-
+    A sample API that uses a sample-site as an example to demonstrate features in
+    the OpenAPI 3.0 specification
+servers:
+  - url: 'http://localhost:8080'
+schemes:
+# スキーマ
+- "http"
+paths:
+  /login:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBody'
+      responses:
+        200:
+          description: ok
+  /board/list:
+    security:
+        - Authorization: []
+    post:
+      responses:
+        200:
+          description: ok
+components:
+  schemas:
+    mail:
+      type: string
+      example: 'test@gmail.com'
+    password:
+      type: string
+      example: test
+    RequestBody:
+      type: object
+      required:
+        - mail
+        - password
+      properties:
+        mail:
+          $ref: '#/components/schemas/mail'
+        password:
+          $ref: '#/components/schemas/password'
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT    # optional, arbitrary value for documentation purposes
+# 2) Apply the security globally to all operations
+security:
+  - bearerAuth: []     

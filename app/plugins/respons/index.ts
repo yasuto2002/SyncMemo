@@ -33,6 +33,7 @@ export default defineNuxtPlugin(() => {
                 }
                 await refresh()
                 return [data.value,statusCode.value]
+
             }
         }
     }

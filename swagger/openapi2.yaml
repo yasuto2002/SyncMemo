@@ -1,0 +1,66 @@
+# swaggerのバージョン定義
+swagger: "2.0"
+# APIについての情報を書く
+info:
+  # API名
+  title: "商品情報API"
+  # APIのバージョン
+  version: "1.0.0"
+  # APIの説明
+  description: "productsテーブルのレコードを登録・更新・取得・削除するAPI"
+#APIのホスト名 
+host: "localhost:8080"
+# 対象のテーブル名?を書く
+tags:
+- name: "products"
+  description: "productsテーブル"
+schemes:
+# スキーマ
+- "http"
+# APIのエントリポイントを記述
+paths:
+  #URIを記載する
+  /login:
+    post:
+      tags: 
+      - "products"
+      summary: "商品情報登録"
+      description: "商品情報をproductsテーブルに1件登録する"
+      produces: 
+      - "application/json"
+      # リクエストのbodyについて記述する
+      parameters:
+      # パラメータの名前
+      - name: "body"
+        # パラメータの場所
+        in: "body"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            mail:
+              type: "string"
+              example: "test@gmail.com"
+            password:
+              type: "string"
+              example: "test2002"
+      responses:
+        200:
+          description: "成功"
+          schema:
+            type: "object"
+            properties:
+              id: 
+                type: "integer"
+                example: "2"
+              name:
+                type: "string"
+                example: "piyopiyo"
+        400:
+          description: "失敗"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Bad Request"
