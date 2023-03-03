@@ -97,6 +97,26 @@ services:
       ME_CONFIG_MONGODB_SERVER: mongo
     depends_on:
       - mongo
+  
+  swagger-editor:
+    image: swaggerapi/swagger-editor
+    container_name: "swagger-editor"
+    ports:
+      - "8001:8080"
+    platform: linux/amd64
+
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: "swagger-ui"
+    ports:
+      - "8002:8080"
+    volumes:
+      - ./swagger/openapi.yaml:/openapi.yaml
+    environment:
+      SWAGGER_JSON: /openapi.yaml
+    platform: linux/amd64
+    
+
 volumes:
   memo-db-data:
   memo-redis-data:
