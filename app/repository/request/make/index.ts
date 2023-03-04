@@ -1,4 +1,4 @@
-export interface Make{
-    name :String
-    password:String
+export interface Make {
+  name: String
+  password: String
 }

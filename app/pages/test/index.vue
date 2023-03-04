@@ -10,13 +10,7 @@
         <h3 class="font-bold text-lg">サーバーURL</h3>
         <div class="flex justify-around items-center my-2">
           <p
-            class="
-              py-2
-              px-10
-              bottom-1
-              border-2 border-black border-solid
-              w-[80%]
-            "
+            class="py-2 px-10 bottom-1 border-2 border-black border-solid w-[80%]"
           >
             https://yasuto0101.com
           </p>
@@ -32,6 +26,6 @@
 </template>
 <script lang="ts" setup>
 const copy = () => {
-  navigator.clipboard.writeText("https://yasuto0101");
-};
+  navigator.clipboard.writeText("https://yasuto0101")
+}
 </script>

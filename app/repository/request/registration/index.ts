@@ -1,4 +1,4 @@
 export interface Registration {
-    token:string
-    mail:string
+  token: string
+  mail: string
 }

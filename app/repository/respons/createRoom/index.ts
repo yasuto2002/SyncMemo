@@ -1,3 +1,3 @@
 export interface createRoom {
-    status:string
+  status: string
 }

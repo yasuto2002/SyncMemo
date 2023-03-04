@@ -1,13 +1,13 @@
-import { io, Socket } from "socket.io-client";
+import { io, Socket } from "socket.io-client"
 interface position {
-  id: string,
-  text: string,
-  x: number,
+  id: string
+  text: string
+  x: number
   y: number
 }
 interface returnData {
-  socket: Socket,
-  make: Function,
+  socket: Socket
+  make: Function
   send: Function
 }
 export default defineNuxtPlugin(() => {
@@ -17,13 +17,13 @@ export default defineNuxtPlugin(() => {
         const config = useRuntimeConfig()
         const socket = io(config.apiServer)
         const sendMemo = (memoData: position) => {
-          socket.emit("moveMemo", memoData);
-        };
+          socket.emit("moveMemo", memoData)
+        }
         const makeMemo = (): void => {
-          socket.emit("makeMemo");
+          socket.emit("makeMemo")
         }
         return { socket: socket, make: makeMemo, send: sendMemo }
-      }
-    }
+      },
+    },
   }
 })

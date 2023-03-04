@@ -1,3 +1,3 @@
 export interface makeBoardRes {
-    id:string
+  id: string
 }

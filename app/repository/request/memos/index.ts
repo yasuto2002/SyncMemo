@@ -1,3 +1,3 @@
 export interface Memos {
-    id:string
-} 
+  id: string
+}

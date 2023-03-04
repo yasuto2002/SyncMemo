@@ -1,3 +1,3 @@
 <template>
-    <p>エラー</p>
+  <p>エラー</p>
 </template>

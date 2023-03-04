@@ -1,4 +1,4 @@
-import { defineNuxtConfig } from 'nuxt'
+import { defineNuxtConfig } from "nuxt"
 
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
 export default defineNuxtConfig({
@@ -7,10 +7,7 @@ export default defineNuxtConfig({
   modules: [
     // Using package name (recommended usage)
   ],
-  css: [
-    '@/assets/css/reset.css',
-    '@/assets/css/main.css'
-  ],
+  css: ["@/assets/css/reset.css", "@/assets/css/main.css"],
 
   ssr: false,
   // 追加
@@ -33,9 +30,9 @@ export default defineNuxtConfig({
       apiContainer: process.env.APICONTAINER,
       socket: process.env.SOCKET,
       domain: process.env.DOMAIN,
-    }
+    },
   },
   alias: {
-    yup: 'yup/lib/index.js'
-  }
+    yup: "yup/lib/index.js",
+  },
 })
