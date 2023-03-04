@@ -1,4 +1,4 @@
-import {Memo} from "../memo"
-export  interface Memos {
-    memo:Array<Memo>
+import { Memo } from "../memo"
+export interface Memos {
+  memo: Array<Memo>
 }

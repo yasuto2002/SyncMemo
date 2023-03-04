@@ -20,16 +20,16 @@
       ref="root"
       v-for="memo in memos"
       :key="memo"
-      v-bind:style="{ top: memo.y + 'px', left: memo.x + 'px'}"
+      v-bind:style="{ top: memo.y + 'px', left: memo.x + 'px' }"
     >
-    {{memo.text}}
+      {{ memo.text }}
     </div>
   </div>
 </template>
 <script setup lang="ts">
-const root = ref(null);
-const config = useRuntimeConfig();
-let memos = ref();
+const root = ref(null)
+const config = useRuntimeConfig()
+let memos = ref()
 </script>
 <style scoped>
 .drag-and-drop {

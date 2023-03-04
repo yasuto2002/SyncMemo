@@ -1,3 +1,3 @@
 export interface boardDelete {
-    boardId:string
+  boardId: string
 }

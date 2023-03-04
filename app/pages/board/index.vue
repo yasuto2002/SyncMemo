@@ -4,7 +4,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import type { Ref } from 'vue';
+import type { Ref } from "vue"
 // const childRef:Ref = ref();
 
 // const onChildMethodClick = () => {

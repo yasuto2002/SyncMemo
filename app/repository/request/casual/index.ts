@@ -1,5 +1,5 @@
 export interface Casual {
-    name:string
-    mail:string
-    password:string
+  name: string
+  mail: string
+  password: string
 }
