@@ -1,0 +1,4 @@
+.nuxt/
+.output/
+tailwind.config.js
+README.md
